@@ -26,5 +26,5 @@ public class WeaponAttachmentPoint
     public string Name;
     public Transform AttachmentPosition;
     public List<WeaponAttachment> AvailableAttachments = new();
-    public WeaponAttachment CurrentAttachment;
+    public GameObject CurrentAttachment;
 }

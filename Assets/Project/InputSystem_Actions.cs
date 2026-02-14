@@ -109,6 +109,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Zoom Axis"",
+                    ""type"": ""Value"",
+                    ""id"": ""0abe57f5-ca76-4380-8f70-5a1d25a447e1"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -131,6 +140,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Rotate Button"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5bf0446d-b85f-4c7e-98f2-0babdd0dde55"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Zoom Axis"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -204,6 +224,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Weapon = asset.FindActionMap("Weapon", throwIfNotFound: true);
         m_Weapon_RotateAxis = m_Weapon.FindAction("Rotate Axis", throwIfNotFound: true);
         m_Weapon_RotateButton = m_Weapon.FindAction("Rotate Button", throwIfNotFound: true);
+        m_Weapon_ZoomAxis = m_Weapon.FindAction("Zoom Axis", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -286,6 +307,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IWeaponActions> m_WeaponActionsCallbackInterfaces = new List<IWeaponActions>();
     private readonly InputAction m_Weapon_RotateAxis;
     private readonly InputAction m_Weapon_RotateButton;
+    private readonly InputAction m_Weapon_ZoomAxis;
     /// <summary>
     /// Provides access to input actions defined in input action map "Weapon".
     /// </summary>
@@ -305,6 +327,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Weapon/RotateButton".
         /// </summary>
         public InputAction @RotateButton => m_Wrapper.m_Weapon_RotateButton;
+        /// <summary>
+        /// Provides access to the underlying input action "Weapon/ZoomAxis".
+        /// </summary>
+        public InputAction @ZoomAxis => m_Wrapper.m_Weapon_ZoomAxis;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -337,6 +363,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @RotateButton.started += instance.OnRotateButton;
             @RotateButton.performed += instance.OnRotateButton;
             @RotateButton.canceled += instance.OnRotateButton;
+            @ZoomAxis.started += instance.OnZoomAxis;
+            @ZoomAxis.performed += instance.OnZoomAxis;
+            @ZoomAxis.canceled += instance.OnZoomAxis;
         }
 
         /// <summary>
@@ -354,6 +383,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @RotateButton.started -= instance.OnRotateButton;
             @RotateButton.performed -= instance.OnRotateButton;
             @RotateButton.canceled -= instance.OnRotateButton;
+            @ZoomAxis.started -= instance.OnZoomAxis;
+            @ZoomAxis.performed -= instance.OnZoomAxis;
+            @ZoomAxis.canceled -= instance.OnZoomAxis;
         }
 
         /// <summary>
@@ -473,5 +505,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRotateButton(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Zoom Axis" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnZoomAxis(InputAction.CallbackContext context);
     }
 }

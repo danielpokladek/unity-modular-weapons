@@ -11,21 +11,6 @@ public class Weapon : MonoBehaviour
 
     private void Start()
     {
-        _weaponBody.AttachmentPoints.ForEach(
-            (point) =>
-            {
-                var firstElem = point.AvailableAttachments[0];
-
-                if (!firstElem)
-                    return;
-
-                Instantiate(
-                    firstElem,
-                    point.AttachmentPosition.position,
-                    Quaternion.identity,
-                    point.AttachmentPosition
-                );
-            }
-        );
+        _weaponBody.SpawnInitialAttachments();
     }
 }

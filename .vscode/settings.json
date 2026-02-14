@@ -67,5 +67,8 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "modular-weapons.slnx"
+    "dotnet.defaultSolution": "modular-weapons.slnx",
+    "cSpell.words": [
+        "Mathf"
+    ]
 }
