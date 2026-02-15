@@ -1,13 +1,17 @@
+using PrimeTween;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
     [SerializeField]
-    Transform _target;
+    Transform _pivot;
+
+    [SerializeField]
+    Transform _weaponContainer;
 
     [Header("Properties")]
     [SerializeField]
-    float _distance = 3f;
+    Vector3 _cameraOffset;
 
     [SerializeField]
     float _sensitivity;
@@ -20,13 +24,19 @@ public class CameraController : MonoBehaviour
 
     private InputSystem_Actions.WeaponActions _actions;
 
-    private bool _isRotating;
+    private Transform _target;
 
     private Vector2 _lookInput;
     private Vector2 _scrollInput;
 
+    private float _distance = 3f;
+
+    private bool _isRotating;
+
     private void Start()
     {
+        _target = _weaponContainer;
+
         _actions = Controls.InputActions.Weapon;
 
         _isRotating = false;
@@ -45,24 +55,22 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!_isRotating)
-            return;
-
         if (_isRotating && _lookInput.sqrMagnitude > 0f)
         {
             transform.RotateAround(
-                _target.position,
+                _pivot.position,
                 Vector3.up,
                 _lookInput.x * _sensitivity * Time.deltaTime
             );
             transform.RotateAround(
-                _target.position,
+                _pivot.position,
                 transform.right,
                 -_lookInput.y * _sensitivity * Time.deltaTime
             );
         }
 
-        transform.LookAt(_target);
+        transform.position = _pivot.position - transform.forward * _distance;
+        transform.LookAt(_pivot);
 
         if (_scrollInput.y != 0f)
         {
@@ -71,5 +79,12 @@ public class CameraController : MonoBehaviour
 
             transform.position = _target.position - transform.forward * _distance;
         }
+    }
+
+    public void SetTarget(Transform target)
+    {
+        _target = target;
+
+        Tween.Position(_pivot, _target.position, duration: 0.25f);
     }
 }

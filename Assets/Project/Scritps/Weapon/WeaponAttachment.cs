@@ -20,13 +20,14 @@ public class WeaponAttachment : MonoBehaviour
             var screenPos = Camera.main.WorldToScreenPoint(worldPos);
 
             var instance = Instantiate(
-                Prefabs.Instance.Get(PrefabId.ATTACHMENT_POINT),
+                Manager.Instance.AttachmentPointUIPrefab,
                 screenPos,
                 Quaternion.identity,
-                Manager.Instance.AttachmentCanvas.transform
+                Manager.Instance.Canvas.transform
             );
+            instance.Initialize(point);
 
-            Manager.Instance.AttachmentPointsUI.RegisterAttachmentToUI(point, instance.transform);
+            Manager.Instance.UIController.RegisterAttachmentToUI(point, instance.transform);
         }
     }
 

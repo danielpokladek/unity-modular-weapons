@@ -3,10 +3,17 @@ using UnityEngine;
 public class Manager : MonoBehaviour
 {
     [SerializeField]
-    Canvas _attachmentsCanvas;
+    Canvas _uiCanvas;
 
     [SerializeField]
-    UIController _attachmentPointsUI;
+    UIController _uiController;
+
+    [SerializeField]
+    CameraController _cameraController;
+
+    [Header("Shared Prefabs")]
+    [SerializeField]
+    AttachmentPointUI _attachmentPointUIPrefab;
 
     public static Manager Instance { get; private set; }
 
@@ -15,6 +22,9 @@ public class Manager : MonoBehaviour
         Instance = this;
     }
 
-    public Canvas AttachmentCanvas => _attachmentsCanvas;
-    public UIController AttachmentPointsUI => _attachmentPointsUI;
+    public Canvas Canvas => _uiCanvas;
+    public UIController UIController => _uiController;
+    public CameraController CameraController => _cameraController;
+
+    public AttachmentPointUI AttachmentPointUIPrefab => _attachmentPointUIPrefab;
 }
