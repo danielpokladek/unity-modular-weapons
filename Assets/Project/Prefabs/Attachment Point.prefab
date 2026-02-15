@@ -50,6 +50,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttachmentPointUI
   _image: {fileID: 3910256987156354764}
+  _selectedAlpha: 1
+  _normalAlpha: 0.5
+  _otherSelectedAlpha: 0.2
 --- !u!1 &8689079413851773314
 GameObject:
   m_ObjectHideFlags: 0

@@ -19,9 +19,14 @@ public class Manager : MonoBehaviour
 
     public static Manager Instance { get; private set; }
 
+    private WeaponAttachmentPoint? _currentAttachmentPoint;
+
     private void Awake()
     {
         Instance = this;
+
+        Events.OnAttachmentPointFocus.AddListener((point) => _currentAttachmentPoint = point);
+        Events.OnAttachmentPointUnfocus.AddListener(() => _currentAttachmentPoint = null);
     }
 
     public Canvas Canvas => _uiCanvas;
@@ -29,4 +34,6 @@ public class Manager : MonoBehaviour
     public CameraController CameraController => _cameraController;
 
     public AttachmentPointUI AttachmentPointUIPrefab => _attachmentPointUIPrefab;
+
+    public bool IsAttachmentSelected => _currentAttachmentPoint != null;
 }

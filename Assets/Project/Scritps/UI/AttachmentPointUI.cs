@@ -13,11 +13,47 @@ public class AttachmentPointUI
     [SerializeField]
     Image _image = null!;
 
+    [SerializeField]
+    float _selectedAlpha;
+
+    [SerializeField]
+    float _normalAlpha;
+
+    [SerializeField]
+    float _otherSelectedAlpha;
+
     private WeaponAttachmentPoint _attachmentPoint = null!;
+
+    private bool _isSelected = false;
 
     private void Start()
     {
         _image.CrossFadeAlpha(0.4f, 0, true);
+
+        Events.OnAttachmentPointFocus.AddListener(HandleAttachmentPointFocus);
+        Events.OnAttachmentPointUnfocus.AddListener(FadeOut);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        FadeIn();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (_isSelected)
+            return;
+
+        FadeOut();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (_isSelected)
+            return;
+
+        _isSelected = true;
+        Events.OnAttachmentPointFocus.Invoke(_attachmentPoint);
     }
 
     public void Initialize(WeaponAttachmentPoint attachmentPoint)
@@ -25,18 +61,26 @@ public class AttachmentPointUI
         _attachmentPoint = attachmentPoint;
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    private void HandleAttachmentPointFocus(WeaponAttachmentPoint attachmentPoint)
     {
-        _image.CrossFadeAlpha(1f, 0.15f, true);
+        if (attachmentPoint == _attachmentPoint)
+            return;
+
+        _isSelected = false;
+        FadeOut();
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    private void FadeOut()
     {
-        _image.CrossFadeAlpha(0.5f, 0.15f, true);
+        _image.CrossFadeAlpha(
+            Manager.Instance.IsAttachmentSelected ? _otherSelectedAlpha : _normalAlpha,
+            0.15f,
+            true
+        );
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void FadeIn()
     {
-        Manager.Instance.CameraController.SetTarget(_attachmentPoint.Transform);
+        _image.CrossFadeAlpha(_selectedAlpha, 0.15f, true);
     }
 }
