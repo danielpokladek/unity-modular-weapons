@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
 
     [Header("Properties")]
     [SerializeField]
-    Vector3 _cameraOffset;
+    Vector3 _pivotOffset;
 
     [SerializeField]
     float _sensitivity;
@@ -25,6 +25,7 @@ public class CameraController : MonoBehaviour
     float _maxDistance = 0.8f;
 
     private InputSystem_Actions.WeaponActions _actions;
+    private Manager _manager;
 
     private Transform _target = null!;
 
@@ -40,6 +41,7 @@ public class CameraController : MonoBehaviour
         _target = _weaponContainer;
 
         _actions = Controls.InputActions.Weapon;
+        _manager = Manager.Instance;
 
         _isRotating = false;
         _distance = _maxDistance;
@@ -52,6 +54,15 @@ public class CameraController : MonoBehaviour
 
         _actions.ZoomAxis.performed += ctx => _scrollInput = ctx.ReadValue<Vector2>();
         _actions.ZoomAxis.canceled += _ => _scrollInput = Vector2.zero;
+
+        Events.OnAttachmentPointFocus.AddListener(
+            (attachmentPoint) =>
+            {
+                SetTarget(attachmentPoint.Transform);
+            }
+        );
+
+        Events.OnAttachmentPointUnfocus.AddListener(() => SetTarget(_weaponContainer));
 
         _actions.Enable();
     }
@@ -72,22 +83,38 @@ public class CameraController : MonoBehaviour
             );
         }
 
-        transform.position = _pivot.position - transform.forward * _distance;
-        transform.LookAt(_pivot);
-
         if (_scrollInput.y != 0f)
         {
             _distance -= _scrollInput.y * 2f * Time.deltaTime;
             _distance = Mathf.Clamp(_distance, _minDistance, _maxDistance);
-
-            transform.position = _target.position - transform.forward * _distance;
         }
+
+        transform.position = _pivot.position - transform.forward * _distance;
+        transform.LookAt(_pivot);
     }
 
     public void SetTarget(Transform target)
     {
         _target = target;
 
-        Tween.Position(_pivot, _target.position, duration: 0.25f);
+        Sequence
+            .Create()
+            .Group(Tween.Position(_pivot, GetPivotPosition(target.position), duration: 0.25f))
+            .Group(
+                Tween.Custom(
+                    _distance,
+                    target == _weaponContainer ? _maxDistance : _minDistance,
+                    0.25f,
+                    (val) =>
+                    {
+                        _distance = val;
+                    }
+                )
+            );
+    }
+
+    private Vector3 GetPivotPosition(Vector3 position)
+    {
+        return position + _pivotOffset;
     }
 }
