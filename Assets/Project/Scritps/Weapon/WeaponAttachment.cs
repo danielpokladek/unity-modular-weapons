@@ -12,17 +12,35 @@ public class WeaponAttachment : MonoBehaviour
     public bool CanBeRemoved => _canBeRemoved;
     public List<WeaponAttachmentPoint> AttachmentPoints => _attachmentPoints;
 
+    private void Start()
+    {
+        foreach (var point in _attachmentPoints)
+        {
+            var worldPos = point.Transform.position;
+            var screenPos = Camera.main.WorldToScreenPoint(worldPos);
+
+            var instance = Instantiate(
+                Prefabs.Instance.Get(PrefabId.ATTACHMENT_POINT),
+                screenPos,
+                Quaternion.identity,
+                Manager.Instance.AttachmentCanvas.transform
+            );
+
+            Manager.Instance.AttachmentPointsUI.RegisterAttachmentToUI(point, instance.transform);
+        }
+    }
+
     public void SpawnInitialAttachments()
     {
         foreach (var point in _attachmentPoints)
         {
-            if (point.AttachmentPosition == null)
+            if (point.Transform == null)
                 return;
 
             if (point.AvailableAttachments.Count == 0)
                 return;
 
-            var parent = point.AttachmentPosition;
+            var parent = point.Transform;
             var position = parent.position;
             var element = point.AvailableAttachments[0];
 
@@ -37,11 +55,11 @@ public class WeaponAttachment : MonoBehaviour
     {
         foreach (var point in _attachmentPoints)
         {
-            if (point.AttachmentPosition == null)
+            if (point.Transform == null)
                 return;
 
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(point.AttachmentPosition.position, 0.01f);
+            Gizmos.DrawWireSphere(point.Transform.position, 0.01f);
         }
     }
 }
