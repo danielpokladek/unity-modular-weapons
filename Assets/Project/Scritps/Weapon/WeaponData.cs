@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,8 +25,8 @@ public class WeaponData
 [Serializable]
 public class WeaponAttachmentPoint
 {
-    public string Name;
-    public Transform Transform;
+    public string Name = "";
+    public Transform Transform = null!;
     public List<WeaponAttachment> AvailableAttachments = new();
-    public GameObject CurrentAttachment;
+    public GameObject CurrentAttachment = null!;
 }

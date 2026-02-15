@@ -1,16 +1,23 @@
+#nullable enable
+
 using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponAttachment : MonoBehaviour
 {
+    [Header("Attachment Properties")]
     [SerializeField]
     bool _canBeRemoved = true;
+
+    [SerializeField]
+    Sprite _uiSprite = null!;
 
     [SerializeField]
     List<WeaponAttachmentPoint> _attachmentPoints = new();
 
     public bool CanBeRemoved => _canBeRemoved;
     public List<WeaponAttachmentPoint> AttachmentPoints => _attachmentPoints;
+    public Sprite UISprite => _uiSprite;
 
     private void Start()
     {

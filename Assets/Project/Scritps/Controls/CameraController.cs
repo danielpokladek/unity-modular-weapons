@@ -1,13 +1,15 @@
+#nullable enable
+
 using PrimeTween;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
     [SerializeField]
-    Transform _pivot;
+    Transform _pivot = null!;
 
     [SerializeField]
-    Transform _weaponContainer;
+    Transform _weaponContainer = null!;
 
     [Header("Properties")]
     [SerializeField]
@@ -17,19 +19,19 @@ public class CameraController : MonoBehaviour
     float _sensitivity;
 
     [SerializeField]
-    float _minZoom = 0.4f;
+    float _minDistance = 0.2f;
 
     [SerializeField]
-    float _maxZoom = 0.8f;
+    float _maxDistance = 0.8f;
 
     private InputSystem_Actions.WeaponActions _actions;
 
-    private Transform _target;
+    private Transform _target = null!;
 
     private Vector2 _lookInput;
     private Vector2 _scrollInput;
 
-    private float _distance = 3f;
+    private float _distance;
 
     private bool _isRotating;
 
@@ -40,6 +42,7 @@ public class CameraController : MonoBehaviour
         _actions = Controls.InputActions.Weapon;
 
         _isRotating = false;
+        _distance = _maxDistance;
 
         _actions.RotateButton.performed += ctx => _isRotating = true;
         _actions.RotateButton.canceled += ctx => _isRotating = false;
@@ -75,7 +78,7 @@ public class CameraController : MonoBehaviour
         if (_scrollInput.y != 0f)
         {
             _distance -= _scrollInput.y * 2f * Time.deltaTime;
-            _distance = Mathf.Clamp(_distance, _minZoom, _maxZoom);
+            _distance = Mathf.Clamp(_distance, _minDistance, _maxDistance);
 
             transform.position = _target.position - transform.forward * _distance;
         }

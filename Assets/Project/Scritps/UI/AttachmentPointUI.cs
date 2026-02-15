@@ -1,3 +1,5 @@
+#nullable enable
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,9 +11,9 @@ public class AttachmentPointUI
         IPointerClickHandler
 {
     [SerializeField]
-    Image _image;
+    Image _image = null!;
 
-    private WeaponAttachmentPoint _attachmentPoint;
+    private WeaponAttachmentPoint _attachmentPoint = null!;
 
     private void Start()
     {

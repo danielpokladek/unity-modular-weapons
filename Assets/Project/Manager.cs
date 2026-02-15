@@ -1,19 +1,21 @@
+#nullable enable
+
 using UnityEngine;
 
 public class Manager : MonoBehaviour
 {
     [SerializeField]
-    Canvas _uiCanvas;
+    Canvas _uiCanvas = null!;
 
     [SerializeField]
-    UIController _uiController;
+    UIController _uiController = null!;
 
     [SerializeField]
-    CameraController _cameraController;
+    CameraController _cameraController = null!;
 
     [Header("Shared Prefabs")]
     [SerializeField]
-    AttachmentPointUI _attachmentPointUIPrefab;
+    AttachmentPointUI _attachmentPointUIPrefab = null!;
 
     public static Manager Instance { get; private set; }
 
