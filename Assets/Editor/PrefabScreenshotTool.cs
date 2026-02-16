@@ -91,9 +91,24 @@ public static class PrefabScreenshotTool
         AssetDatabase.Refresh();
         Debug.Log("[UI SCREENSHOT]: Finished generating prefab screenshots");
 
-        foreach (string file in Directory.GetFiles(settings.OutputFolder, "*.png"))
+        string[] files = Directory.GetFiles(
+            settings.OutputFolder,
+            "*.png",
+            SearchOption.AllDirectories
+        );
+
+        foreach (string file in files)
         {
-            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(file);
+            string assetPath = file.Replace(Application.dataPath, "Assets");
+
+            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
+
+            if (importer == null)
+            {
+                Debug.LogWarning($"[UI SCREENSHOT]: Invalid path for importer! {assetPath}");
+                continue;
+            }
+
             importer.textureType = TextureImporterType.Sprite;
             importer.alphaIsTransparency = true;
             importer.SaveAndReimport();
