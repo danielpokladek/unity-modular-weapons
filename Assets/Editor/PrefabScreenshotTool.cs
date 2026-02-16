@@ -18,6 +18,8 @@ public static class PrefabScreenshotTool
 {
     public static void Generate(PrefabScreenshotSettings settings)
     {
+        Debug.Log("[UI SCREENSHOT]: Starting UI icons generation");
+
         if (!Directory.Exists(settings.PrefabFolder))
         {
             Debug.LogError($"[UI SCREENSHOT]: Invalid prefab folder: {settings.PrefabFolder}!");
@@ -42,7 +44,7 @@ public static class PrefabScreenshotTool
 
             if (prefab == null)
             {
-                Debug.LogWarning($"Skipped invalid prefab at path: {path}");
+                Debug.LogWarning($"[UI SCREENSHOT]: Skipped invalid prefab at path: {path}");
                 continue;
             }
 
@@ -51,13 +53,13 @@ public static class PrefabScreenshotTool
 
             if (go == null)
             {
-                Debug.LogWarning($"Skipped invalid prefab at path: {path}");
+                Debug.LogWarning($"[UI SCREENSHOT]: Skipped invalid prefab at path: {path}");
                 continue;
             }
 
             go.transform.rotation = Quaternion.Euler(settings.Rotation);
 
-            string relativePath = path.Substring(settings.PrefabFolder.Length);
+            string relativePath = path[settings.PrefabFolder.Length..];
 
             // Remove leading slashes
             relativePath = relativePath.TrimStart('/', '\\');
@@ -87,7 +89,7 @@ public static class PrefabScreenshotTool
         }
 
         AssetDatabase.Refresh();
-        Debug.Log("Finished generating prefab screenshots");
+        Debug.Log("[UI SCREENSHOT]: Finished generating prefab screenshots");
 
         foreach (string file in Directory.GetFiles(settings.OutputFolder, "*.png"))
         {
@@ -111,7 +113,7 @@ public static class PrefabScreenshotTool
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        GameObject lightGO = new GameObject("TempLight");
+        GameObject lightGO = new("TempLight");
         Light light = lightGO.AddComponent<Light>();
         light.type = LightType.Directional;
         light.transform.rotation = Quaternion.Euler(50, 30, 0);
@@ -120,7 +122,7 @@ public static class PrefabScreenshotTool
 
         Bounds bounds = CalculateBounds(prefabInstance);
 
-        GameObject cameraGO = new GameObject("TempCamera");
+        GameObject cameraGO = new("TempCamera");
         Camera camera = cameraGO.AddComponent<Camera>();
 
         camera.orthographic = isOrthographic;
@@ -136,15 +138,15 @@ public static class PrefabScreenshotTool
         camera.nearClipPlane = 0.01f;
         camera.farClipPlane = 100f;
 
-        RenderTexture rt = new RenderTexture(resolution, resolution, 24);
+        RenderTexture rt = new(resolution, resolution, 24);
         camera.targetTexture = rt;
 
-        Texture2D screenshot = new Texture2D(resolution, resolution, TextureFormat.ARGB32, false);
+        Texture2D screenshot = new(resolution, resolution, TextureFormat.ARGB32, false);
         camera.Render();
 
         RenderTexture.active = rt;
 
-        screenshot.ReadPixels(new Rect(0, 0, resolution, resolution), 0, 0);
+        screenshot.ReadPixels(new(0, 0, resolution, resolution), 0, 0);
         screenshot.Apply();
 
         byte[] bytes = screenshot.EncodeToPNG();
@@ -170,7 +172,8 @@ public static class PrefabScreenshotTool
             Debug.LogWarning(
                 $"[UI SCREENSHOT]: No renderers found for prefab: {go.name}! Defaulting to 1x1x1 bounds."
             );
-            return new Bounds(go.transform.position, Vector3.one);
+
+            return new(go.transform.position, Vector3.one);
         }
 
         Bounds bounds = renderers[0].bounds;
