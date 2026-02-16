@@ -13,7 +13,7 @@ public class Weapon : MonoBehaviour
 
     private void Start()
     {
-        _weaponBody.SpawnInitialAttachments();
+        // _weaponBody.SpawnInitialAttachments();
     }
 
     public WeaponData WeaponData => _weaponData;

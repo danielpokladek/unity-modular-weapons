@@ -29,5 +29,5 @@ public class WeaponAttachmentPoint
     public Transform Transform = null!;
     public List<WeaponAttachment> AvailableAttachments = new();
 
-    public WeaponAttachment CurrentAttachment = null!;
+    public WeaponAttachment? CurrentAttachment = null;
 }

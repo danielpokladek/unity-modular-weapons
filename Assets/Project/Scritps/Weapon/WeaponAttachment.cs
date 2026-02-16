@@ -73,6 +73,14 @@ public class WeaponAttachment : MonoBehaviour
         }
     }
 
+    public void RemoveUIPoints()
+    {
+        foreach (var point in _attachmentPoints)
+        {
+            Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
+        }
+    }
+
     private void OnDrawGizmos()
     {
         foreach (var point in _attachmentPoints)

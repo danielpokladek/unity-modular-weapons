@@ -1,12 +1,17 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using PrimeTween;
 using UnityEngine;
 
 public class UIController : MonoBehaviour
 {
     [SerializeField]
     ItemUI _itemPrefab;
+
+    [SerializeField]
+    RectTransform _itemsPanel;
 
     [SerializeField]
     RectTransform _itemsContainer;
@@ -16,10 +21,17 @@ public class UIController : MonoBehaviour
 
     private Dictionary<WeaponAttachmentPoint, Transform> _attachmentDictionary = new();
 
+    private List<ItemUI> _currentItems = new();
+    private List<ItemUI> _inactiveItems = new();
+
+    private bool _isPanelShown;
+
     private void Start()
     {
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
-        Events.OnAttachmentPointUnfocus.AddListener(HandleAttachmentUnselected);
+        Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
+
+        HidePanel(true);
     }
 
     private void Update()
@@ -37,6 +49,15 @@ public class UIController : MonoBehaviour
         uiPoint.SetParent(_pointsContainer);
     }
 
+    public void UnregisterAttachmentFromUI(WeaponAttachmentPoint point)
+    {
+        // TODO: Pool those.
+        var uiPoint = _attachmentDictionary[point];
+        uiPoint.SetParent(null);
+
+        _attachmentDictionary.Remove(point);
+    }
+
     public void UnselectAttachment()
     {
         Events.OnAttachmentPointUnfocus.Invoke();
@@ -45,50 +66,111 @@ public class UIController : MonoBehaviour
     private void HandleAttachmentSelected(WeaponAttachmentPoint point)
     {
         ClearExistingItems();
+        RefreshCurrentItems();
 
-        bool attachmentIsCurrent = point == Manager.Instance.CurrentAttachmentPoint;
+        ShowPanel();
+    }
+
+    private async Task HandleAttachmentUnselected()
+    {
+        await HidePanel();
+
+        ClearExistingItems();
+    }
+
+    private void RefreshCurrentItems()
+    {
+        ClearExistingItems();
+
+        WeaponAttachmentPoint? point = Manager.Instance.CurrentAttachmentPoint;
+
+        if (point == null)
+            return;
 
         foreach (var attachment in point.AvailableAttachments)
         {
-            var instance = Instantiate(
-                _itemPrefab,
-                Vector2.zero,
-                Quaternion.identity,
-                _itemsContainer
-            );
+            var newItem = GetItemUI();
+            _currentItems.Add(newItem);
 
             if (attachment.UISprite != null)
             {
-                instance.ItemImage.sprite = attachment.UISprite;
+                newItem.ItemImage.sprite = attachment.UISprite;
             }
 
-            if (!attachmentIsCurrent)
-                continue;
+            bool itemIsCurrent = point.CurrentAttachment?.ID == attachment.ID;
 
-            print("Is Current Point");
+            if (itemIsCurrent)
+            {
+                newItem.Button.interactable = false;
+            }
+            else
+            {
+                newItem.Button.onClick.AddListener(() =>
+                {
+                    if (point.CurrentAttachment != null)
+                    {
+                        point.CurrentAttachment.RemoveUIPoints();
+                        Destroy(point.CurrentAttachment.gameObject);
+                    }
 
-            bool itemIsCurrent = point.CurrentAttachment.ID == attachment.ID;
+                    var newAttachment = Instantiate(
+                        attachment,
+                        Vector3.zero,
+                        Quaternion.identity,
+                        point.Transform
+                    );
+                    newAttachment.transform.localPosition = Vector3.zero;
 
-            if (!itemIsCurrent)
-                continue;
+                    point.CurrentAttachment = newAttachment;
+                    RefreshCurrentItems();
+                });
+            }
 
-            print("Is Current Attachment");
-
-            instance.Button.interactable = false;
+            newItem.transform.SetParent(_itemsContainer);
         }
     }
 
-    private void HandleAttachmentUnselected()
+    public void ShowPanel(bool isInstant = false)
     {
-        ClearExistingItems();
+        if (_isPanelShown == true)
+            return;
+
+        _isPanelShown = true;
+
+        Tween.UIAnchoredPosition(_itemsPanel, Vector2.zero, duration: isInstant ? 0 : 0.15f);
+    }
+
+    private Tween HidePanel(bool isInstant = false)
+    {
+        _isPanelShown = false;
+
+        return Tween.UIAnchoredPosition(
+            _itemsPanel,
+            new Vector2(370, 0),
+            duration: isInstant ? 0 : 0.15f
+        );
     }
 
     private void ClearExistingItems()
     {
-        // TODO: Pool these items.
-        foreach (RectTransform child in _itemsContainer)
+        while (_currentItems.Count > 0)
         {
-            Destroy(child.gameObject);
+            var item = _currentItems[0];
+            _currentItems.Remove(item);
+
+            item.Reset();
+            _inactiveItems.Add(item);
         }
+    }
+
+    private ItemUI GetItemUI()
+    {
+        if (_inactiveItems.Count == 0)
+            return Instantiate(_itemPrefab, Vector2.zero, Quaternion.identity);
+
+        var item = _inactiveItems[0];
+        _inactiveItems.Remove(item);
+
+        return item;
     }
 }

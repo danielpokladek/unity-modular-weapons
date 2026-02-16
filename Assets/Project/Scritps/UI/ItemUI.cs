@@ -12,4 +12,13 @@ public class ItemUI : MonoBehaviour
     public Image ItemImage => _itemImage;
 
     public Button Button => _button;
+
+    public void Reset()
+    {
+        _itemImage.sprite = null;
+        _button.interactable = true;
+        transform.SetParent(null);
+
+        _button.onClick.RemoveAllListeners();
+    }
 }
