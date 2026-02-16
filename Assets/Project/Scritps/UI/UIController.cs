@@ -42,11 +42,13 @@ public class UIController : MonoBehaviour
         Events.OnAttachmentPointUnfocus.Invoke();
     }
 
-    private void HandleAttachmentSelected(WeaponAttachmentPoint attachment)
+    private void HandleAttachmentSelected(WeaponAttachmentPoint point)
     {
         ClearExistingItems();
 
-        foreach (var possibleAttachment in attachment.AvailableAttachments)
+        bool attachmentIsCurrent = point == Manager.Instance.CurrentAttachmentPoint;
+
+        foreach (var attachment in point.AvailableAttachments)
         {
             var instance = Instantiate(
                 _itemPrefab,
@@ -55,10 +57,24 @@ public class UIController : MonoBehaviour
                 _itemsContainer
             );
 
-            if (possibleAttachment.UISprite != null)
+            if (attachment.UISprite != null)
             {
-                instance.ItemImage.sprite = possibleAttachment.UISprite;
+                instance.ItemImage.sprite = attachment.UISprite;
             }
+
+            if (!attachmentIsCurrent)
+                continue;
+
+            print("Is Current Point");
+
+            bool itemIsCurrent = point.CurrentAttachment.ID == attachment.ID;
+
+            if (!itemIsCurrent)
+                continue;
+
+            print("Is Current Attachment");
+
+            instance.Button.interactable = false;
         }
     }
 

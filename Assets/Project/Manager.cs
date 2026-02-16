@@ -36,4 +36,5 @@ public class Manager : MonoBehaviour
     public AttachmentPointUI AttachmentPointUIPrefab => _attachmentPointUIPrefab;
 
     public bool IsAttachmentSelected => _currentAttachmentPoint != null;
+    public WeaponAttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;
 }

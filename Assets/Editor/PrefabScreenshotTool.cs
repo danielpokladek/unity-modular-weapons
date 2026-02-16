@@ -177,7 +177,7 @@ public static class PrefabScreenshotTool
 
         if (settings.AutoAssignSprites)
         {
-            AssignSpritesToPrefabs(guids, settings.PrefabFolder, settings.OutputFolder);
+            AssignDataToPrefab(guids, settings.PrefabFolder, settings.OutputFolder);
         }
 
         EditorUtility.ClearProgressBar();
@@ -253,11 +253,7 @@ public static class PrefabScreenshotTool
         return bounds;
     }
 
-    private static void AssignSpritesToPrefabs(
-        string[] guids,
-        string prefabFolder,
-        string outputFolder
-    )
+    private static void AssignDataToPrefab(string[] guids, string prefabFolder, string outputFolder)
     {
         var length = guids.Length;
 
@@ -292,15 +288,26 @@ public static class PrefabScreenshotTool
             if (prefab.TryGetComponent(out WeaponAttachment attachment))
             {
                 SerializedObject so = new(attachment);
-                SerializedProperty prop = so.FindProperty("_uiSprite");
 
-                if (prop != null)
+                SerializedProperty spriteProp = so.FindProperty("_uiSprite");
+
+                if (spriteProp != null)
                 {
-                    prop.objectReferenceValue = sprite;
+                    spriteProp.objectReferenceValue = sprite;
                     so.ApplyModifiedProperties();
 
                     EditorUtility.SetDirty(prefab);
                 }
+
+                SerializedProperty idProp = so.FindProperty("_id");
+
+                if (idProp != null)
+                {
+                    idProp.intValue = i;
+                }
+
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(prefab);
             }
         }
     }

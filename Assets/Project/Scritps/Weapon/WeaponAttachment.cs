@@ -10,17 +10,31 @@ public class WeaponAttachment : MonoBehaviour
     bool _canBeRemoved = true;
 
     [SerializeField]
+    List<WeaponAttachmentPoint> _attachmentPoints = new();
+
+    [Header("Auto Assigned")]
+    [SerializeField]
     Sprite _uiSprite = null!;
 
     [SerializeField]
-    List<WeaponAttachmentPoint> _attachmentPoints = new();
+    int _id = -1;
+
+    public List<WeaponAttachmentPoint> AttachmentPoints => _attachmentPoints;
+
+    public Sprite UISprite => _uiSprite;
 
     public bool CanBeRemoved => _canBeRemoved;
-    public List<WeaponAttachmentPoint> AttachmentPoints => _attachmentPoints;
-    public Sprite UISprite => _uiSprite;
+
+    public int ID => _id;
 
     private void Start()
     {
+        if (_id == -1)
+        {
+            Debug.LogError($"No ID has been assigned for {gameObject.name}!");
+            return;
+        }
+
         foreach (var point in _attachmentPoints)
         {
             var worldPos = point.Transform.position;
@@ -55,7 +69,7 @@ public class WeaponAttachment : MonoBehaviour
             var instance = Instantiate(element, position, Quaternion.identity, parent);
             instance.SpawnInitialAttachments();
 
-            point.CurrentAttachment = instance.gameObject;
+            point.CurrentAttachment = instance;
         }
     }
 

@@ -70,6 +70,7 @@
     "dotnet.defaultSolution": "modular-weapons.slnx",
     "cSpell.words": [
         "ARGB",
+        "interactable",
         "Mathf",
         "Prefs",
         "Synty"
