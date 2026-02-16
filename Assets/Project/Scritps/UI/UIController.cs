@@ -54,7 +54,11 @@ public class UIController : MonoBehaviour
                 Quaternion.identity,
                 _itemsContainer
             );
-            // instance.ItemImage.sprite = possibleAttachment.UISprite;
+
+            if (possibleAttachment.UISprite != null)
+            {
+                instance.ItemImage.sprite = possibleAttachment.UISprite;
+            }
         }
     }
 
