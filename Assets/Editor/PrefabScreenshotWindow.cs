@@ -13,14 +13,19 @@ public class PrefabScreenshotWindow : EditorWindow
     private const string ROTATION_Y_KEY = "PrefabScreenshots_RotationY";
     private const string ROTATION_Z_KEY = "PrefabScreenshots_RotationZ";
     private const string ORTHOGRAPHIC_KEY = "PrefabScreenshots_Orthographic";
+    private const string AUTO_ASSIGN_KEY = "PrefabScreenshots_AutoAssign";
 
     private DefaultAsset? _prefabFolderAsset;
     private DefaultAsset? _outputFolderAsset;
 
     private int _resolution = 512;
+
     private float _padding = 1.15f;
-    private Vector3 _rotation = new Vector3(0, 90, 0);
+
+    private Vector3 _rotation = new(0, 90, 0);
+
     private bool _isOrthographic = true;
+    private bool _autoAssign = true;
 
     [MenuItem("Tools/Prefab Screenshot Generator")]
     public static void ShowWindow()
@@ -51,6 +56,7 @@ public class PrefabScreenshotWindow : EditorWindow
         );
 
         _isOrthographic = EditorPrefs.GetBool(ORTHOGRAPHIC_KEY, true);
+        _autoAssign = EditorPrefs.GetBool(AUTO_ASSIGN_KEY, true);
     }
 
     private void OnGUI()
@@ -83,6 +89,7 @@ public class PrefabScreenshotWindow : EditorWindow
         _padding = EditorGUILayout.FloatField("Padding", _padding);
         _rotation = EditorGUILayout.Vector3Field("Rotation", _rotation);
         _isOrthographic = EditorGUILayout.Toggle("Is Orthographic", _isOrthographic);
+        _autoAssign = EditorGUILayout.Toggle("Auto Assign Sprites", _autoAssign);
 
         GUILayout.Space(20);
 
@@ -102,6 +109,7 @@ public class PrefabScreenshotWindow : EditorWindow
                 Padding = _padding,
                 Rotation = _rotation,
                 IsOrthographic = _isOrthographic,
+                AutoAssignSprites = _autoAssign,
             };
 
             PrefabScreenshotTool.Generate(settings);
@@ -133,5 +141,6 @@ public class PrefabScreenshotWindow : EditorWindow
         EditorPrefs.SetFloat(ROTATION_Z_KEY, _rotation.z);
 
         EditorPrefs.SetBool(ORTHOGRAPHIC_KEY, _isOrthographic);
+        EditorPrefs.SetBool(AUTO_ASSIGN_KEY, _autoAssign);
     }
 }
