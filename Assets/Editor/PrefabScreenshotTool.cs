@@ -110,6 +110,8 @@ public static class PrefabScreenshotTool
             }
 
             importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.spritePixelsPerUnit = settings.Resolution;
             importer.alphaIsTransparency = true;
             importer.SaveAndReimport();
         }
