@@ -89,7 +89,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     ""name"": ""InputSystem_Actions"",
     ""maps"": [
         {
-            ""name"": ""Weapon"",
+            ""name"": ""UI"",
             ""id"": ""272f6d14-89ba-496f-b7ff-215263d3219f"",
             ""actions"": [
                 {
@@ -118,6 +118,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Toggle UI"",
+                    ""type"": ""Button"",
+                    ""id"": ""6f16e8c0-2cd3-4c69-8b55-91d5f64ede40"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -151,6 +160,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Zoom Axis"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c055402-36e1-4946-9aff-e209db259f29"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Toggle UI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -220,16 +240,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // Weapon
-        m_Weapon = asset.FindActionMap("Weapon", throwIfNotFound: true);
-        m_Weapon_RotateAxis = m_Weapon.FindAction("Rotate Axis", throwIfNotFound: true);
-        m_Weapon_RotateButton = m_Weapon.FindAction("Rotate Button", throwIfNotFound: true);
-        m_Weapon_ZoomAxis = m_Weapon.FindAction("Zoom Axis", throwIfNotFound: true);
+        // UI
+        m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
+        m_UI_RotateAxis = m_UI.FindAction("Rotate Axis", throwIfNotFound: true);
+        m_UI_RotateButton = m_UI.FindAction("Rotate Button", throwIfNotFound: true);
+        m_UI_ZoomAxis = m_UI.FindAction("Zoom Axis", throwIfNotFound: true);
+        m_UI_ToggleUI = m_UI.FindAction("Toggle UI", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
-        UnityEngine.Debug.Assert(!m_Weapon.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Weapon.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
     }
 
     /// <summary>
@@ -302,39 +323,44 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // Weapon
-    private readonly InputActionMap m_Weapon;
-    private List<IWeaponActions> m_WeaponActionsCallbackInterfaces = new List<IWeaponActions>();
-    private readonly InputAction m_Weapon_RotateAxis;
-    private readonly InputAction m_Weapon_RotateButton;
-    private readonly InputAction m_Weapon_ZoomAxis;
+    // UI
+    private readonly InputActionMap m_UI;
+    private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
+    private readonly InputAction m_UI_RotateAxis;
+    private readonly InputAction m_UI_RotateButton;
+    private readonly InputAction m_UI_ZoomAxis;
+    private readonly InputAction m_UI_ToggleUI;
     /// <summary>
-    /// Provides access to input actions defined in input action map "Weapon".
+    /// Provides access to input actions defined in input action map "UI".
     /// </summary>
-    public struct WeaponActions
+    public struct UIActions
     {
         private @InputSystem_Actions m_Wrapper;
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
-        public WeaponActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public UIActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Weapon/RotateAxis".
+        /// Provides access to the underlying input action "UI/RotateAxis".
         /// </summary>
-        public InputAction @RotateAxis => m_Wrapper.m_Weapon_RotateAxis;
+        public InputAction @RotateAxis => m_Wrapper.m_UI_RotateAxis;
         /// <summary>
-        /// Provides access to the underlying input action "Weapon/RotateButton".
+        /// Provides access to the underlying input action "UI/RotateButton".
         /// </summary>
-        public InputAction @RotateButton => m_Wrapper.m_Weapon_RotateButton;
+        public InputAction @RotateButton => m_Wrapper.m_UI_RotateButton;
         /// <summary>
-        /// Provides access to the underlying input action "Weapon/ZoomAxis".
+        /// Provides access to the underlying input action "UI/ZoomAxis".
         /// </summary>
-        public InputAction @ZoomAxis => m_Wrapper.m_Weapon_ZoomAxis;
+        public InputAction @ZoomAxis => m_Wrapper.m_UI_ZoomAxis;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/ToggleUI".
+        /// </summary>
+        public InputAction @ToggleUI => m_Wrapper.m_UI_ToggleUI;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
-        public InputActionMap Get() { return m_Wrapper.m_Weapon; }
+        public InputActionMap Get() { return m_Wrapper.m_UI; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
@@ -342,9 +368,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
-        /// Implicitly converts an <see ref="WeaponActions" /> to an <see ref="InputActionMap" /> instance.
+        /// Implicitly converts an <see ref="UIActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        public static implicit operator InputActionMap(WeaponActions set) { return set.Get(); }
+        public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -352,11 +378,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
         /// </remarks>
-        /// <seealso cref="WeaponActions" />
-        public void AddCallbacks(IWeaponActions instance)
+        /// <seealso cref="UIActions" />
+        public void AddCallbacks(IUIActions instance)
         {
-            if (instance == null || m_Wrapper.m_WeaponActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_WeaponActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_UIActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UIActionsCallbackInterfaces.Add(instance);
             @RotateAxis.started += instance.OnRotateAxis;
             @RotateAxis.performed += instance.OnRotateAxis;
             @RotateAxis.canceled += instance.OnRotateAxis;
@@ -366,6 +392,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ZoomAxis.started += instance.OnZoomAxis;
             @ZoomAxis.performed += instance.OnZoomAxis;
             @ZoomAxis.canceled += instance.OnZoomAxis;
+            @ToggleUI.started += instance.OnToggleUI;
+            @ToggleUI.performed += instance.OnToggleUI;
+            @ToggleUI.canceled += instance.OnToggleUI;
         }
 
         /// <summary>
@@ -374,8 +403,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
-        /// <seealso cref="WeaponActions" />
-        private void UnregisterCallbacks(IWeaponActions instance)
+        /// <seealso cref="UIActions" />
+        private void UnregisterCallbacks(IUIActions instance)
         {
             @RotateAxis.started -= instance.OnRotateAxis;
             @RotateAxis.performed -= instance.OnRotateAxis;
@@ -386,15 +415,18 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ZoomAxis.started -= instance.OnZoomAxis;
             @ZoomAxis.performed -= instance.OnZoomAxis;
             @ZoomAxis.canceled -= instance.OnZoomAxis;
+            @ToggleUI.started -= instance.OnToggleUI;
+            @ToggleUI.performed -= instance.OnToggleUI;
+            @ToggleUI.canceled -= instance.OnToggleUI;
         }
 
         /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="WeaponActions.UnregisterCallbacks(IWeaponActions)" />.
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="UIActions.UnregisterCallbacks(IUIActions)" />.
         /// </summary>
-        /// <seealso cref="WeaponActions.UnregisterCallbacks(IWeaponActions)" />
-        public void RemoveCallbacks(IWeaponActions instance)
+        /// <seealso cref="UIActions.UnregisterCallbacks(IUIActions)" />
+        public void RemoveCallbacks(IUIActions instance)
         {
-            if (m_Wrapper.m_WeaponActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_UIActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
@@ -404,21 +436,21 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
         /// </remarks>
-        /// <seealso cref="WeaponActions.AddCallbacks(IWeaponActions)" />
-        /// <seealso cref="WeaponActions.RemoveCallbacks(IWeaponActions)" />
-        /// <seealso cref="WeaponActions.UnregisterCallbacks(IWeaponActions)" />
-        public void SetCallbacks(IWeaponActions instance)
+        /// <seealso cref="UIActions.AddCallbacks(IUIActions)" />
+        /// <seealso cref="UIActions.RemoveCallbacks(IUIActions)" />
+        /// <seealso cref="UIActions.UnregisterCallbacks(IUIActions)" />
+        public void SetCallbacks(IUIActions instance)
         {
-            foreach (var item in m_Wrapper.m_WeaponActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_UIActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_WeaponActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_UIActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
     /// <summary>
-    /// Provides a new <see cref="WeaponActions" /> instance referencing this action map.
+    /// Provides a new <see cref="UIActions" /> instance referencing this action map.
     /// </summary>
-    public WeaponActions @Weapon => new WeaponActions(this);
+    public UIActions @UI => new UIActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -485,11 +517,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Weapon" which allows adding and removing callbacks.
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
     /// </summary>
-    /// <seealso cref="WeaponActions.AddCallbacks(IWeaponActions)" />
-    /// <seealso cref="WeaponActions.RemoveCallbacks(IWeaponActions)" />
-    public interface IWeaponActions
+    /// <seealso cref="UIActions.AddCallbacks(IUIActions)" />
+    /// <seealso cref="UIActions.RemoveCallbacks(IUIActions)" />
+    public interface IUIActions
     {
         /// <summary>
         /// Method invoked when associated input action "Rotate Axis" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
@@ -512,5 +544,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoomAxis(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Toggle UI" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleUI(InputAction.CallbackContext context);
     }
 }

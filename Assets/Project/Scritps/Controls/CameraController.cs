@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     float _maxDistance = 0.8f;
 
-    private InputSystem_Actions.WeaponActions _actions;
+    private InputSystem_Actions.UIActions _actions;
     private Manager _manager;
 
     private Transform _target = null!;
@@ -40,7 +40,7 @@ public class CameraController : MonoBehaviour
     {
         _target = _weaponContainer;
 
-        _actions = Controls.InputActions.Weapon;
+        _actions = Controls.InputActions.UI;
         _manager = Manager.Instance;
 
         _isRotating = false;

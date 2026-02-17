@@ -19,6 +19,12 @@ public class UIController : MonoBehaviour
     [SerializeField]
     RectTransform _pointsContainer;
 
+    [SerializeField]
+    Sprite _removeAttachmentIcon;
+
+    [SerializeField]
+    CanvasGroup _pointsCanvasGroup;
+
     private Dictionary<WeaponAttachmentPoint, Transform> _attachmentDictionary = new();
 
     private List<ItemUI> _currentItems = new();
@@ -26,10 +32,16 @@ public class UIController : MonoBehaviour
 
     private bool _isPanelShown;
 
+    private Tween? _uiTween;
+
+    private bool _exploded = false;
+
     private void Start()
     {
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
         Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
+
+        Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         HidePanel(true);
     }
@@ -40,6 +52,20 @@ public class UIController : MonoBehaviour
         {
             var screenPos = Camera.main.WorldToScreenPoint(point.Key.Transform.position);
             point.Value.transform.position = screenPos;
+        }
+    }
+
+    public void HandleExplodeButtonPressed()
+    {
+        _exploded = !_exploded;
+
+        if (_exploded)
+        {
+            Events.OnExplodeWeapon.Invoke();
+        }
+        else
+        {
+            Events.OnCompactWeapon.Invoke();
         }
     }
 
@@ -87,6 +113,18 @@ public class UIController : MonoBehaviour
         if (point == null)
             return;
 
+        var removeButton = GetItemUI();
+        removeButton.ItemImage.sprite = _removeAttachmentIcon;
+        removeButton.Button.onClick.AddListener(() =>
+        {
+            point.RemoveCurrentAttachment();
+            RefreshCurrentItems();
+        });
+        removeButton.Button.interactable = point.CurrentAttachment != null;
+        removeButton.transform.SetParent(_itemsContainer);
+
+        _currentItems.Add(removeButton);
+
         foreach (var attachment in point.AvailableAttachments)
         {
             var newItem = GetItemUI();
@@ -97,33 +135,25 @@ public class UIController : MonoBehaviour
                 newItem.ItemImage.sprite = attachment.UISprite;
             }
 
-            bool itemIsCurrent = point.CurrentAttachment?.ID == attachment.ID;
+            newItem.Button.onClick.AddListener(() =>
+            {
+                point.RemoveCurrentAttachment();
 
-            if (itemIsCurrent)
+                var newAttachment = Instantiate(
+                    attachment,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    point.Transform
+                );
+                newAttachment.transform.localPosition = Vector3.zero;
+
+                point.CurrentAttachment = newAttachment;
+                RefreshCurrentItems();
+            });
+
+            if (point.CurrentAttachment?.ID == attachment.ID)
             {
                 newItem.Button.interactable = false;
-            }
-            else
-            {
-                newItem.Button.onClick.AddListener(() =>
-                {
-                    if (point.CurrentAttachment != null)
-                    {
-                        point.CurrentAttachment.RemoveUIPoints();
-                        Destroy(point.CurrentAttachment.gameObject);
-                    }
-
-                    var newAttachment = Instantiate(
-                        attachment,
-                        Vector3.zero,
-                        Quaternion.identity,
-                        point.Transform
-                    );
-                    newAttachment.transform.localPosition = Vector3.zero;
-
-                    point.CurrentAttachment = newAttachment;
-                    RefreshCurrentItems();
-                });
             }
 
             newItem.transform.SetParent(_itemsContainer);
@@ -172,5 +202,23 @@ public class UIController : MonoBehaviour
         _inactiveItems.Remove(item);
 
         return item;
+    }
+
+    private void ToggleUI()
+    {
+        _uiTween?.Complete();
+
+        var uiVisible = _pointsCanvasGroup.alpha == 1;
+        var desiredAlpha = uiVisible ? 0 : 1;
+
+        _uiTween = Tween.Custom(
+            _pointsCanvasGroup.alpha,
+            desiredAlpha,
+            0.2f,
+            (val) =>
+            {
+                _pointsCanvasGroup.alpha = val;
+            }
+        );
     }
 }

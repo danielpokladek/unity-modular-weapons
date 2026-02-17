@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using PrimeTween;
 using UnityEngine;
 
 public class WeaponAttachment : MonoBehaviour
@@ -18,6 +19,9 @@ public class WeaponAttachment : MonoBehaviour
 
     [SerializeField]
     int _id = -1;
+
+    private Vector3 _explodeDirection;
+    private Vector3 _originalPosition;
 
     public List<WeaponAttachmentPoint> AttachmentPoints => _attachmentPoints;
 
@@ -50,6 +54,22 @@ public class WeaponAttachment : MonoBehaviour
 
             Manager.Instance.UIController.RegisterAttachmentToUI(point, instance.transform);
         }
+
+        _explodeDirection = GetAxisDirection(transform.parent.position);
+        _originalPosition = transform.localPosition;
+
+        if (CanBeRemoved)
+        {
+            Events.OnExplodeWeapon.AddListener(ExplodeAttachment);
+            Events.OnCompactWeapon.AddListener(CompactAttachment);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        RemoveUIPoints();
+        Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
+        Events.OnCompactWeapon.RemoveListener(CompactAttachment);
     }
 
     public void SpawnInitialAttachments()
@@ -86,10 +106,37 @@ public class WeaponAttachment : MonoBehaviour
         foreach (var point in _attachmentPoints)
         {
             if (point.Transform == null)
-                return;
+                continue;
 
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(point.Transform.position, 0.01f);
         }
+    }
+
+    private Vector3 GetAxisDirection(Vector3 position)
+    {
+        position = position.normalized;
+
+        float absX = Mathf.Abs(position.x);
+        float absY = Mathf.Abs(position.y);
+        float absZ = Mathf.Abs(position.z);
+
+        if (absX > absY && absX > absZ)
+            return new Vector3(Mathf.Sign(position.x), 0, 0);
+
+        // if (absY > absX && absY > absZ)
+        //     return new Vector3(0, Mathf.Sign(position.y), 0);
+
+        return new Vector3(0, 0, Mathf.Sign(position.z));
+    }
+
+    private void ExplodeAttachment()
+    {
+        Tween.LocalPosition(transform, _explodeDirection * 0.3f, 0.25f);
+    }
+
+    private void CompactAttachment()
+    {
+        Tween.LocalPosition(transform, _originalPosition, 0.25f);
     }
 }

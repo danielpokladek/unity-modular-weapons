@@ -30,4 +30,14 @@ public class WeaponAttachmentPoint
     public List<WeaponAttachment> AvailableAttachments = new();
 
     public WeaponAttachment? CurrentAttachment = null;
+
+    public void RemoveCurrentAttachment()
+    {
+        if (CurrentAttachment == null)
+            return;
+
+        CurrentAttachment.RemoveUIPoints();
+        UnityEngine.Object.Destroy(CurrentAttachment.gameObject);
+        CurrentAttachment = null;
+    }
 }

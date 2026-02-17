@@ -14,6 +14,9 @@ public class AttachmentPointUI
     Image _image = null!;
 
     [SerializeField]
+    TMPro.TMP_Text _label = null!;
+
+    [SerializeField]
     float _selectedAlpha;
 
     [SerializeField]
@@ -59,6 +62,7 @@ public class AttachmentPointUI
     public void Initialize(WeaponAttachmentPoint attachmentPoint)
     {
         _attachmentPoint = attachmentPoint;
+        _label.text = attachmentPoint.Name;
     }
 
     private void HandleAttachmentPointFocus(WeaponAttachmentPoint attachmentPoint)
