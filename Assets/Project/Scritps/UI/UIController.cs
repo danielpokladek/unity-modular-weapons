@@ -52,6 +52,15 @@ public class UIController : MonoBehaviour
         {
             var screenPos = Camera.main.WorldToScreenPoint(point.Key.Transform.position);
             point.Value.transform.position = screenPos;
+
+            if (_isPanelShown && point.Key == Manager.Instance.CurrentAttachmentPoint)
+            {
+                var pointHeight = (point.Value.transform as RectTransform)?.sizeDelta.y ?? 30;
+                var panelPos = screenPos;
+                panelPos.y -= pointHeight;
+
+                _itemsPanel.transform.position = panelPos;
+            }
         }
     }
 
@@ -94,12 +103,12 @@ public class UIController : MonoBehaviour
         ClearExistingItems();
         RefreshCurrentItems();
 
-        ShowPanel();
+        ShowPanel(point);
     }
 
     private async Task HandleAttachmentUnselected()
     {
-        await HidePanel();
+        HidePanel();
 
         ClearExistingItems();
     }
@@ -122,6 +131,7 @@ public class UIController : MonoBehaviour
         });
         removeButton.Button.interactable = point.CurrentAttachment != null;
         removeButton.transform.SetParent(_itemsContainer);
+        removeButton.transform.localScale = Vector3.one;
 
         _currentItems.Add(removeButton);
 
@@ -145,6 +155,7 @@ public class UIController : MonoBehaviour
                     Quaternion.identity,
                     point.Transform
                 );
+
                 newAttachment.transform.localPosition = Vector3.zero;
 
                 point.CurrentAttachment = newAttachment;
@@ -157,28 +168,35 @@ public class UIController : MonoBehaviour
             }
 
             newItem.transform.SetParent(_itemsContainer);
+            newItem.transform.localScale = Vector3.one;
         }
     }
 
-    public void ShowPanel(bool isInstant = false)
+    public void ShowPanel(WeaponAttachmentPoint point, bool isInstant = false)
     {
         if (_isPanelShown == true)
             return;
 
         _isPanelShown = true;
+        _itemsPanel.gameObject.SetActive(true);
 
-        Tween.UIAnchoredPosition(_itemsPanel, Vector2.zero, duration: isInstant ? 0 : 0.15f);
+        // var uiPoint = _attachmentDictionary[point];
+
+        // _itemsPanel.transform.localPosition = uiPoint.transform.localPosition;
+
+        // Tween.UIAnchoredPosition(_itemsPanel, Vector2.zero, duration: isInstant ? 0 : 0.15f);
     }
 
-    private Tween HidePanel(bool isInstant = false)
+    private void HidePanel(bool isInstant = false)
     {
         _isPanelShown = false;
+        _itemsPanel.gameObject.SetActive(false);
 
-        return Tween.UIAnchoredPosition(
-            _itemsPanel,
-            new Vector2(370, 0),
-            duration: isInstant ? 0 : 0.15f
-        );
+        // return Tween.UIAnchoredPosition(
+        //     _itemsPanel,
+        //     new Vector2(370, 0),
+        //     duration: isInstant ? 0 : 0.15f
+        // );
     }
 
     private void ClearExistingItems()
