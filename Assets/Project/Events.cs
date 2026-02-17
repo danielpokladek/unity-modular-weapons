@@ -7,4 +7,6 @@ public static class Events
 
     public static UnityEvent OnExplodeWeapon = new();
     public static UnityEvent OnCompactWeapon = new();
+
+    public static UnityEvent OnAttachmentChanged = new();
 }

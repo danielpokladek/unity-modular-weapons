@@ -31,7 +31,7 @@ public class WeaponAttachmentPoint
 
     public WeaponAttachment? CurrentAttachment = null;
 
-    public void RemoveCurrentAttachment()
+    public void RemoveCurrentAttachment(bool notify = true)
     {
         if (CurrentAttachment == null)
             return;
@@ -39,5 +39,30 @@ public class WeaponAttachmentPoint
         CurrentAttachment.RemoveUIPoints();
         UnityEngine.Object.Destroy(CurrentAttachment.gameObject);
         CurrentAttachment = null;
+
+        if (notify)
+        {
+            Events.OnAttachmentChanged.Invoke();
+        }
+    }
+
+    public void SetAttachment(int id)
+    {
+        var attachment = AvailableAttachments.Find((a) => a.ID == id);
+
+        if (attachment == null)
+        {
+            Debug.LogWarning($"Tried to attach something that isn't in available list: {id}");
+            return;
+        }
+
+        RemoveCurrentAttachment(false);
+
+        CurrentAttachment = UnityEngine.Object.Instantiate(attachment, Transform);
+
+        CurrentAttachment.transform.localPosition = Vector3.zero;
+        CurrentAttachment.transform.localRotation = Quaternion.identity;
+
+        Events.OnAttachmentChanged.Invoke();
     }
 }

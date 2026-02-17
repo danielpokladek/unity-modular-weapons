@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections.Generic;
 using EditorAttributes;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class Weapon : MonoBehaviour
 
     [SerializeField]
     WeaponAttachment _weaponBody = null!;
+
+    private List<int> _attachedIDList = new();
 
     private void Start()
     {

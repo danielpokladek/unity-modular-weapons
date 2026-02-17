@@ -40,6 +40,7 @@ public class UIController : MonoBehaviour
     {
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
         Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
+        Events.OnAttachmentChanged.AddListener(RefreshButtonList);
 
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
@@ -50,6 +51,9 @@ public class UIController : MonoBehaviour
     {
         foreach (var point in _attachmentDictionary)
         {
+            if (point.Value == null)
+                return;
+
             var screenPos = Camera.main.WorldToScreenPoint(point.Key.Transform.position);
             point.Value.transform.position = screenPos;
 
@@ -57,7 +61,7 @@ public class UIController : MonoBehaviour
             {
                 var pointHeight = (point.Value.transform as RectTransform)?.sizeDelta.y ?? 30;
                 var panelPos = screenPos;
-                panelPos.y -= pointHeight;
+                panelPos.y -= pointHeight * 0.85f;
 
                 _itemsPanel.transform.position = panelPos;
             }
@@ -86,9 +90,12 @@ public class UIController : MonoBehaviour
 
     public void UnregisterAttachmentFromUI(WeaponAttachmentPoint point)
     {
+        if (!_attachmentDictionary.ContainsKey(point))
+            return;
+
         // TODO: Pool those.
-        var uiPoint = _attachmentDictionary[point];
-        uiPoint.SetParent(null);
+        Transform? uiPoint = _attachmentDictionary[point];
+        uiPoint?.SetParent(null);
 
         _attachmentDictionary.Remove(point);
     }
@@ -101,7 +108,7 @@ public class UIController : MonoBehaviour
     private void HandleAttachmentSelected(WeaponAttachmentPoint point)
     {
         ClearExistingItems();
-        RefreshCurrentItems();
+        RefreshButtonList();
 
         ShowPanel(point);
     }
@@ -113,7 +120,7 @@ public class UIController : MonoBehaviour
         ClearExistingItems();
     }
 
-    private void RefreshCurrentItems()
+    private void RefreshButtonList()
     {
         ClearExistingItems();
 
@@ -122,12 +129,11 @@ public class UIController : MonoBehaviour
         if (point == null)
             return;
 
-        var removeButton = GetItemUI();
+        var removeButton = GetAttachmentButton();
         removeButton.ItemImage.sprite = _removeAttachmentIcon;
         removeButton.Button.onClick.AddListener(() =>
         {
             point.RemoveCurrentAttachment();
-            RefreshCurrentItems();
         });
         removeButton.Button.interactable = point.CurrentAttachment != null;
         removeButton.transform.SetParent(_itemsContainer);
@@ -137,38 +143,24 @@ public class UIController : MonoBehaviour
 
         foreach (var attachment in point.AvailableAttachments)
         {
-            var newItem = GetItemUI();
-            _currentItems.Add(newItem);
+            var attachmentButton = GetAttachmentButton();
+            attachmentButton.ItemImage.sprite = attachment.UISprite;
 
-            if (attachment.UISprite != null)
-            {
-                newItem.ItemImage.sprite = attachment.UISprite;
-            }
-
-            newItem.Button.onClick.AddListener(() =>
+            attachmentButton.Button.onClick.AddListener(() =>
             {
                 point.RemoveCurrentAttachment();
-
-                var newAttachment = Instantiate(
-                    attachment,
-                    Vector3.zero,
-                    Quaternion.identity,
-                    point.Transform
-                );
-
-                newAttachment.transform.localPosition = Vector3.zero;
-
-                point.CurrentAttachment = newAttachment;
-                RefreshCurrentItems();
+                point.SetAttachment(attachment.ID);
             });
 
             if (point.CurrentAttachment?.ID == attachment.ID)
             {
-                newItem.Button.interactable = false;
+                attachmentButton.Button.interactable = false;
             }
 
-            newItem.transform.SetParent(_itemsContainer);
-            newItem.transform.localScale = Vector3.one;
+            attachmentButton.transform.SetParent(_itemsContainer);
+            attachmentButton.transform.localScale = Vector3.one;
+
+            _currentItems.Add(attachmentButton);
         }
     }
 
@@ -179,24 +171,12 @@ public class UIController : MonoBehaviour
 
         _isPanelShown = true;
         _itemsPanel.gameObject.SetActive(true);
-
-        // var uiPoint = _attachmentDictionary[point];
-
-        // _itemsPanel.transform.localPosition = uiPoint.transform.localPosition;
-
-        // Tween.UIAnchoredPosition(_itemsPanel, Vector2.zero, duration: isInstant ? 0 : 0.15f);
     }
 
     private void HidePanel(bool isInstant = false)
     {
         _isPanelShown = false;
         _itemsPanel.gameObject.SetActive(false);
-
-        // return Tween.UIAnchoredPosition(
-        //     _itemsPanel,
-        //     new Vector2(370, 0),
-        //     duration: isInstant ? 0 : 0.15f
-        // );
     }
 
     private void ClearExistingItems()
@@ -211,7 +191,7 @@ public class UIController : MonoBehaviour
         }
     }
 
-    private ItemUI GetItemUI()
+    private ItemUI GetAttachmentButton()
     {
         if (_inactiveItems.Count == 0)
             return Instantiate(_itemPrefab, Vector2.zero, Quaternion.identity);
