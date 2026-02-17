@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum FireMode
@@ -28,6 +29,8 @@ public class WeaponAttachmentPoint
     public string Name = "";
     public Transform Transform = null!;
     public List<WeaponAttachment> AvailableAttachments = new();
+    public List<WeaponAttachment> IncompatibleAttachments = new();
+    public HashSet<int> IncompatibleAttachmentIDs = new();
 
     public WeaponAttachment? CurrentAttachment = null;
 
@@ -35,6 +38,8 @@ public class WeaponAttachmentPoint
     {
         if (CurrentAttachment == null)
             return;
+
+        IncompatibleAttachmentIDs = IncompatibleAttachments.Select(o => o.ID).ToHashSet();
 
         CurrentAttachment.RemoveUIPoints();
         UnityEngine.Object.Destroy(CurrentAttachment.gameObject);

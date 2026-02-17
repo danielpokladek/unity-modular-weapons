@@ -1,7 +1,10 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
+using Mono.Cecil;
 using PrimeTween;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WeaponAttachment : MonoBehaviour
@@ -39,20 +42,21 @@ public class WeaponAttachment : MonoBehaviour
             return;
         }
 
+        Weapon? currentWeapon = Manager.Instance.CurrentWeapon;
+
         foreach (var point in _attachmentPoints)
         {
-            var worldPos = point.Transform.position;
-            var screenPos = Camera.main.WorldToScreenPoint(worldPos);
+            if (currentWeapon != null)
+            {
+                bool isIncompatible = currentWeapon.CurrentAttachmentIDList.Any(id =>
+                    point.IncompatibleAttachmentIDs.Contains(id)
+                );
 
-            var instance = Instantiate(
-                Manager.Instance.AttachmentPointUIPrefab,
-                screenPos,
-                Quaternion.identity,
-                Manager.Instance.Canvas.transform
-            );
-            instance.Initialize(point);
+                if (isIncompatible)
+                    continue;
+            }
 
-            Manager.Instance.UIController.RegisterAttachmentToUI(point, instance.transform);
+            Manager.Instance.UIController.RegisterAttachmentToUI(point);
         }
 
         _explodeDirection = GetAxisDirection(transform.parent.position);
@@ -63,13 +67,33 @@ public class WeaponAttachment : MonoBehaviour
             Events.OnExplodeWeapon.AddListener(ExplodeAttachment);
             Events.OnCompactWeapon.AddListener(CompactAttachment);
         }
+
+        Events.OnAttachmentChanged.AddListener(RefreshAttachments);
     }
 
     private void OnDestroy()
     {
-        RemoveUIPoints();
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
+        Events.OnAttachmentChanged.RemoveListener(RefreshAttachments);
+    }
+
+    public HashSet<int> GetCurrentAttachmentIDList()
+    {
+        HashSet<int> attachmentIDList = new();
+
+        foreach (var attachment in _attachmentPoints)
+        {
+            if (attachment.CurrentAttachment != null)
+            {
+                var currentAttachment = attachment.CurrentAttachment;
+
+                attachmentIDList.Add(currentAttachment.ID);
+                attachmentIDList.AddRange(currentAttachment.GetCurrentAttachmentIDList());
+            }
+        }
+
+        return attachmentIDList;
     }
 
     public void SpawnInitialAttachments()
@@ -124,9 +148,6 @@ public class WeaponAttachment : MonoBehaviour
         if (absX > absY && absX > absZ)
             return new Vector3(Mathf.Sign(position.x), 0, 0);
 
-        // if (absY > absX && absY > absZ)
-        //     return new Vector3(0, Mathf.Sign(position.y), 0);
-
         return new Vector3(0, 0, Mathf.Sign(position.z));
     }
 
@@ -138,5 +159,28 @@ public class WeaponAttachment : MonoBehaviour
     private void CompactAttachment()
     {
         Tween.LocalPosition(transform, _originalPosition, 0.25f);
+    }
+
+    private void RefreshAttachments()
+    {
+        Weapon? currentWeapon = Manager.Instance.CurrentWeapon;
+
+        foreach (var point in _attachmentPoints)
+        {
+            if (currentWeapon != null)
+            {
+                bool isIncompatible = currentWeapon.CurrentAttachmentIDList.Any(id =>
+                    point.IncompatibleAttachmentIDs.Contains(id)
+                );
+
+                if (isIncompatible)
+                {
+                    Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
+                    continue;
+                }
+            }
+
+            Manager.Instance.UIController.RegisterAttachmentToUI(point);
+        }
     }
 }

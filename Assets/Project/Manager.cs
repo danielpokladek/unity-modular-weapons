@@ -17,6 +17,9 @@ public class Manager : MonoBehaviour
     [SerializeField]
     AttachmentPointUI _attachmentPointUIPrefab = null!;
 
+    [SerializeField]
+    Weapon _currentWeapon = null!;
+
     public static Manager Instance { get; private set; }
 
     private WeaponAttachmentPoint? _currentAttachmentPoint;
@@ -37,4 +40,6 @@ public class Manager : MonoBehaviour
 
     public bool IsAttachmentSelected => _currentAttachmentPoint != null;
     public WeaponAttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;
+
+    public Weapon? CurrentWeapon => _currentWeapon;
 }

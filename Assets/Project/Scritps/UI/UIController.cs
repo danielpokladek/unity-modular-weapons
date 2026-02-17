@@ -82,10 +82,24 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void RegisterAttachmentToUI(WeaponAttachmentPoint point, Transform uiPoint)
+    public void RegisterAttachmentToUI(WeaponAttachmentPoint point)
     {
-        _attachmentDictionary.Add(point, uiPoint);
-        uiPoint.SetParent(_pointsContainer);
+        if (_attachmentDictionary.ContainsKey(point))
+            return;
+
+        var worldPos = point.Transform.position;
+        var screenPos = Camera.main.WorldToScreenPoint(worldPos);
+
+        var newPoint = Instantiate(
+            Manager.Instance.AttachmentPointUIPrefab,
+            screenPos,
+            Quaternion.identity,
+            Manager.Instance.Canvas.transform
+        );
+        newPoint.Initialize(point);
+
+        _attachmentDictionary.Add(point, newPoint.transform);
+        newPoint.transform.SetParent(_pointsContainer);
     }
 
     public void UnregisterAttachmentFromUI(WeaponAttachmentPoint point)
