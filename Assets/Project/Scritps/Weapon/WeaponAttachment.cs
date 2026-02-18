@@ -71,6 +71,21 @@ public class WeaponAttachment : MonoBehaviour
         Events.OnUpdateUI.AddListener(RefreshAttachments);
     }
 
+    public void HandleCleanup()
+    {
+        foreach (var point in _attachmentPoints)
+        {
+            Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
+            point.CurrentAttachment?.HandleCleanup();
+        }
+
+        RemoveUIPoints();
+
+        Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
+        Events.OnCompactWeapon.RemoveListener(CompactAttachment);
+        Events.OnUpdateUI.RemoveListener(RefreshAttachments);
+    }
+
     private void OnDestroy()
     {
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);

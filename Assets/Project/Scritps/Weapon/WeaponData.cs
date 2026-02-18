@@ -67,9 +67,7 @@ public class WeaponAttachmentPoint : ISerializationCallbackReceiver
         if (CurrentAttachment == null)
             return;
 
-        _incompatibleAttachmentIDs = IncompatibleAttachments.Select(o => o.ID).ToHashSet();
-
-        CurrentAttachment.RemoveUIPoints();
+        CurrentAttachment.HandleCleanup();
         UnityEngine.Object.Destroy(CurrentAttachment.gameObject);
         CurrentAttachment = null;
 
