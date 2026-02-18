@@ -105,11 +105,13 @@ public class UIController : MonoBehaviour
     public void UnregisterAttachmentFromUI(WeaponAttachmentPoint point)
     {
         if (!_attachmentDictionary.ContainsKey(point))
+        {
             return;
+        }
 
         // TODO: Pool those.
-        Transform? uiPoint = _attachmentDictionary[point];
-        uiPoint?.SetParent(null);
+        Transform uiPoint = _attachmentDictionary[point];
+        uiPoint.SetParent(null);
 
         _attachmentDictionary.Remove(point);
     }

@@ -24,22 +24,50 @@ public class WeaponData
 }
 
 [Serializable]
-public class WeaponAttachmentPoint
+public class WeaponAttachmentPoint : ISerializationCallbackReceiver
 {
     public string Name = "";
     public Transform Transform = null!;
     public List<WeaponAttachment> AvailableAttachments = new();
     public List<WeaponAttachment> IncompatibleAttachments = new();
-    public HashSet<int> IncompatibleAttachmentIDs = new();
 
     public WeaponAttachment? CurrentAttachment = null;
+
+    private HashSet<int> _incompatibleAttachmentIDs;
+
+    public WeaponAttachmentPoint()
+    {
+        _incompatibleAttachmentIDs = new();
+    }
+
+    public HashSet<int> IncompatibleAttachmentIDs => _incompatibleAttachmentIDs;
+
+    public void OnAfterDeserialize()
+    {
+        // Update the incompatible attachment IDs after deserialization to ensure they are in sync with the IncompatibleAttachments list.
+        _incompatibleAttachmentIDs = IncompatibleAttachments.Select(a => a.ID).ToHashSet();
+    }
+
+    public void OnBeforeSerialize()
+    {
+        // Required by ISerializationCallbackReceiver.
+    }
+
+    public void AddIncompatibleAttachment(WeaponAttachment attachment)
+    {
+        if (!IncompatibleAttachments.Contains(attachment))
+        {
+            IncompatibleAttachments.Add(attachment);
+            _incompatibleAttachmentIDs.Add(attachment.ID);
+        }
+    }
 
     public void RemoveCurrentAttachment(bool notify = true)
     {
         if (CurrentAttachment == null)
             return;
 
-        IncompatibleAttachmentIDs = IncompatibleAttachments.Select(o => o.ID).ToHashSet();
+        _incompatibleAttachmentIDs = IncompatibleAttachments.Select(o => o.ID).ToHashSet();
 
         CurrentAttachment.RemoveUIPoints();
         UnityEngine.Object.Destroy(CurrentAttachment.gameObject);

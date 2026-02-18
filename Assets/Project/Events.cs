@@ -9,4 +9,6 @@ public static class Events
     public static UnityEvent OnCompactWeapon = new();
 
     public static UnityEvent OnAttachmentChanged = new();
+
+    public static UnityEvent OnUpdateUI = new();
 }

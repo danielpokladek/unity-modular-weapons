@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Mono.Cecil;
 using PrimeTween;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -68,14 +67,15 @@ public class WeaponAttachment : MonoBehaviour
             Events.OnCompactWeapon.AddListener(CompactAttachment);
         }
 
-        Events.OnAttachmentChanged.AddListener(RefreshAttachments);
+        // TODO: This should probably live in UI controller.
+        Events.OnUpdateUI.AddListener(RefreshAttachments);
     }
 
     private void OnDestroy()
     {
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
-        Events.OnAttachmentChanged.RemoveListener(RefreshAttachments);
+        Events.OnUpdateUI.RemoveListener(RefreshAttachments);
     }
 
     public HashSet<int> GetCurrentAttachmentIDList()
@@ -165,22 +165,25 @@ public class WeaponAttachment : MonoBehaviour
     {
         Weapon? currentWeapon = Manager.Instance.CurrentWeapon;
 
+        if (currentWeapon == null)
+            return;
+
+        var currentAttachmentIDs = currentWeapon.CurrentAttachmentIDList;
+
         foreach (var point in _attachmentPoints)
         {
-            if (currentWeapon != null)
+            var matchingIDs = currentAttachmentIDs
+                .Where(id => point.IncompatibleAttachmentIDs.Contains(id))
+                .ToList();
+
+            if (matchingIDs.Count > 0)
             {
-                bool isIncompatible = currentWeapon.CurrentAttachmentIDList.Any(id =>
-                    point.IncompatibleAttachmentIDs.Contains(id)
-                );
-
-                if (isIncompatible)
-                {
-                    Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
-                    continue;
-                }
+                Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
             }
-
-            Manager.Instance.UIController.RegisterAttachmentToUI(point);
+            else
+            {
+                Manager.Instance.UIController.RegisterAttachmentToUI(point);
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ public class AttachmentPointUI
         _image.CrossFadeAlpha(0.4f, 0, true);
 
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentPointFocus);
-        Events.OnAttachmentPointUnfocus.AddListener(FadeOut);
+        Events.OnAttachmentPointUnfocus.AddListener(HandleAttachmentPointUnfocus);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -68,6 +68,15 @@ public class AttachmentPointUI
     private void HandleAttachmentPointFocus(WeaponAttachmentPoint attachmentPoint)
     {
         if (attachmentPoint == _attachmentPoint)
+            return;
+
+        _isSelected = false;
+        FadeOut();
+    }
+
+    private void HandleAttachmentPointUnfocus()
+    {
+        if (!_isSelected)
             return;
 
         _isSelected = false;

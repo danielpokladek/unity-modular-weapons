@@ -17,8 +17,6 @@ public class Weapon : MonoBehaviour
 
     private void Start()
     {
-        // _weaponBody.SpawnInitialAttachments();
-
         RefreshAttachmentList();
         Events.OnAttachmentChanged.AddListener(RefreshAttachmentList);
     }
@@ -34,5 +32,7 @@ public class Weapon : MonoBehaviour
     private void RefreshAttachmentList()
     {
         _currentAttachmentIDList = _weaponBody.GetCurrentAttachmentIDList();
+
+        Events.OnUpdateUI.Invoke();
     }
 }
