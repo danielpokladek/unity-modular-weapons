@@ -14,6 +14,9 @@ public class UIController : MonoBehaviour
     RectTransform _itemsPanel;
 
     [SerializeField]
+    TMPro.TMP_Text _itemsPanelHeading;
+
+    [SerializeField]
     RectTransform _itemsContainer;
 
     [SerializeField]
@@ -126,7 +129,7 @@ public class UIController : MonoBehaviour
         ClearExistingItems();
         RefreshButtonList();
 
-        ShowPanel();
+        ShowPanel(point.Name);
     }
 
     private async Task HandleAttachmentUnselected()
@@ -180,8 +183,10 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void ShowPanel()
+    public void ShowPanel(string attachmentName)
     {
+        _itemsPanelHeading.text = attachmentName;
+
         if (_isPanelShown == true)
             return;
 
