@@ -1,7 +1,7 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using PrimeTween;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -130,16 +130,31 @@ public class WeaponAttachment : MonoBehaviour
 
     private Vector3 GetAxisDirection(Vector3 position)
     {
-        position = position.normalized;
+        var dir = position - new Vector3(0, 0.06f, 0.05f);
 
-        float absX = Mathf.Abs(position.x);
-        float absY = Mathf.Abs(position.y);
-        float absZ = Mathf.Abs(position.z);
+        if (dir == Vector3.zero)
+            return Vector3.zero;
 
-        if (absX > absY && absX > absZ)
-            return new Vector3(Mathf.Sign(position.x), 0, 0);
+        dir.Normalize();
 
-        return new Vector3(0, 0, Mathf.Sign(position.z));
+        float horiz = Mathf.Sqrt(dir.x * dir.x + dir.z * dir.z);
+        float azDeg = Mathf.Atan2(dir.z, dir.x) * Mathf.Rad2Deg;
+        float elDeg = Mathf.Atan2(dir.y, horiz) * Mathf.Rad2Deg;
+
+        float roundedAz = Mathf.Round(azDeg / 45f) * 45f;
+        float roundedEl = Mathf.Round(elDeg / 45f) * 45f;
+
+        float azRad = roundedAz * Mathf.Deg2Rad;
+        float elRad = roundedEl * Mathf.Deg2Rad;
+        float cosEl = Mathf.Cos(elRad);
+
+        var result = new Vector3(
+            cosEl * Mathf.Cos(azRad),
+            Mathf.Sin(elRad),
+            cosEl * Mathf.Sin(azRad)
+        );
+
+        return result.normalized;
     }
 
     private void ExplodeAttachment()

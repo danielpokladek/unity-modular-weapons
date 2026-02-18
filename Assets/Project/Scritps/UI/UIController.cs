@@ -110,8 +110,8 @@ public class UIController : MonoBehaviour
         }
 
         // TODO: Pool those.
-        Transform uiPoint = _attachmentDictionary[point];
-        uiPoint.SetParent(null);
+        Transform? uiPoint = _attachmentDictionary[point];
+        uiPoint?.SetParent(null);
 
         _attachmentDictionary.Remove(point);
     }
