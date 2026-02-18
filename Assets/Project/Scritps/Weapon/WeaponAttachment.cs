@@ -13,7 +13,7 @@ public class WeaponAttachment : MonoBehaviour
     bool _canBeRemoved = true;
 
     [SerializeField]
-    List<WeaponAttachmentPoint> _attachmentPoints = new();
+    List<AttachmentPoint> _attachmentPoints = new();
 
     [Header("Auto Assigned")]
     [SerializeField]
@@ -25,7 +25,7 @@ public class WeaponAttachment : MonoBehaviour
     private Vector3 _explodeDirection;
     private Vector3 _originalPosition;
 
-    public List<WeaponAttachmentPoint> AttachmentPoints => _attachmentPoints;
+    public List<AttachmentPoint> AttachmentPoints => _attachmentPoints;
 
     public Sprite UISprite => _uiSprite;
 
@@ -45,11 +45,15 @@ public class WeaponAttachment : MonoBehaviour
 
         foreach (var point in _attachmentPoints)
         {
+            // point.Initialize();
+
             if (currentWeapon != null)
             {
-                bool isIncompatible = currentWeapon.CurrentAttachmentIDList.Any(id =>
-                    point.IncompatibleAttachmentIDs.Contains(id)
-                );
+                // bool isIncompatible = currentWeapon.CurrentAttachmentIDList.Any(id =>
+                //     point.IncompatibleAttachmentIDs.Contains(id)
+                // );
+
+                bool isIncompatible = false;
 
                 if (isIncompatible)
                     continue;
@@ -68,7 +72,7 @@ public class WeaponAttachment : MonoBehaviour
         }
 
         // TODO: This should probably live in UI controller.
-        Events.OnUpdateUI.AddListener(RefreshAttachments);
+        // Events.OnUpdateUI.AddListener(RefreshAttachments);
     }
 
     public void HandleCleanup()
@@ -83,53 +87,50 @@ public class WeaponAttachment : MonoBehaviour
 
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
-        Events.OnUpdateUI.RemoveListener(RefreshAttachments);
+        // Events.OnUpdateUI.RemoveListener(RefreshAttachments);
     }
 
     private void OnDestroy()
     {
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
-        Events.OnUpdateUI.RemoveListener(RefreshAttachments);
+        // Events.OnUpdateUI.RemoveListener(RefreshAttachments);
     }
 
-    public HashSet<int> GetCurrentAttachmentIDList()
+    public HashSet<WeaponAttachment> FetchEquippedAttachments()
     {
-        HashSet<int> attachmentIDList = new();
+        HashSet<WeaponAttachment> attachments = new();
 
-        foreach (var attachment in _attachmentPoints)
+        foreach (var point in _attachmentPoints)
         {
-            if (attachment.CurrentAttachment != null)
-            {
-                var currentAttachment = attachment.CurrentAttachment;
+            if (point.CurrentAttachment == null)
+                continue;
 
-                attachmentIDList.Add(currentAttachment.ID);
-                attachmentIDList.AddRange(currentAttachment.GetCurrentAttachmentIDList());
+            var currentAttachment = point.CurrentAttachment;
+
+            attachments.Add(point.CurrentAttachment);
+            attachments.AddRange(currentAttachment.FetchEquippedAttachments());
+        }
+
+        return attachments;
+    }
+
+    public HashSet<AttachmentPoint> FetchAttachmentSlots()
+    {
+        HashSet<AttachmentPoint> attachmentPoints = new();
+
+        foreach (var point in _attachmentPoints)
+        {
+            attachmentPoints.Add(point);
+
+            if (point.CurrentAttachment != null)
+            {
+                var a = point.CurrentAttachment.FetchAttachmentSlots();
+                attachmentPoints.AddRange(a);
             }
         }
 
-        return attachmentIDList;
-    }
-
-    public void SpawnInitialAttachments()
-    {
-        foreach (var point in _attachmentPoints)
-        {
-            if (point.Transform == null)
-                return;
-
-            if (point.AvailableAttachments.Count == 0)
-                return;
-
-            var parent = point.Transform;
-            var position = parent.position;
-            var element = point.AvailableAttachments[0];
-
-            var instance = Instantiate(element, position, Quaternion.identity, parent);
-            instance.SpawnInitialAttachments();
-
-            point.CurrentAttachment = instance;
-        }
+        return attachmentPoints;
     }
 
     public void RemoveUIPoints()
@@ -144,11 +145,12 @@ public class WeaponAttachment : MonoBehaviour
     {
         foreach (var point in _attachmentPoints)
         {
-            if (point.Transform == null)
+            // TODO: Remove after updating from old script to new.
+            if (point == null)
                 continue;
 
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(point.Transform.position, 0.01f);
+            Gizmos.DrawWireSphere(point.transform.position, 0.01f);
         }
     }
 
@@ -183,15 +185,16 @@ public class WeaponAttachment : MonoBehaviour
         if (currentWeapon == null)
             return;
 
-        var currentAttachmentIDs = currentWeapon.CurrentAttachmentIDList;
+        var currentAttachmentPoints = currentWeapon.CurrentAttachmentPoints;
+        var currentAttachments = currentWeapon.CurrentAttachments;
 
         foreach (var point in _attachmentPoints)
         {
-            var matchingIDs = currentAttachmentIDs
-                .Where(id => point.IncompatibleAttachmentIDs.Contains(id))
-                .ToList();
+            var isIncompatible = currentAttachmentPoints.Any(a =>
+                point.IncompatibleAttachmentPoints.Contains(a)
+            );
 
-            if (matchingIDs.Count > 0)
+            if (isIncompatible)
             {
                 Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
             }

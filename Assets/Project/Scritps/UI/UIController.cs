@@ -25,7 +25,7 @@ public class UIController : MonoBehaviour
     [SerializeField]
     CanvasGroup _pointsCanvasGroup;
 
-    private Dictionary<WeaponAttachmentPoint, Transform> _attachmentDictionary = new();
+    private Dictionary<AttachmentPoint, Transform> _attachmentDictionary = new();
 
     private List<ItemUI> _currentItems = new();
     private List<ItemUI> _inactiveItems = new();
@@ -54,7 +54,7 @@ public class UIController : MonoBehaviour
             if (point.Value == null)
                 return;
 
-            var screenPos = Camera.main.WorldToScreenPoint(point.Key.Transform.position);
+            var screenPos = Camera.main.WorldToScreenPoint(point.Key.transform.position);
             point.Value.transform.position = screenPos;
 
             if (_isPanelShown && point.Key == Manager.Instance.CurrentAttachmentPoint)
@@ -82,12 +82,12 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void RegisterAttachmentToUI(WeaponAttachmentPoint point)
+    public void RegisterAttachmentToUI(AttachmentPoint point)
     {
         if (_attachmentDictionary.ContainsKey(point))
             return;
 
-        var worldPos = point.Transform.position;
+        var worldPos = point.transform.position;
         var screenPos = Camera.main.WorldToScreenPoint(worldPos);
 
         var newPoint = Instantiate(
@@ -102,7 +102,7 @@ public class UIController : MonoBehaviour
         newPoint.transform.SetParent(_pointsContainer);
     }
 
-    public void UnregisterAttachmentFromUI(WeaponAttachmentPoint point)
+    public void UnregisterAttachmentFromUI(AttachmentPoint point)
     {
         if (!_attachmentDictionary.ContainsKey(point))
         {
@@ -121,12 +121,12 @@ public class UIController : MonoBehaviour
         Events.OnAttachmentPointUnfocus.Invoke();
     }
 
-    private void HandleAttachmentSelected(WeaponAttachmentPoint point)
+    private void HandleAttachmentSelected(AttachmentPoint point)
     {
         ClearExistingItems();
         RefreshButtonList();
 
-        ShowPanel(point);
+        ShowPanel();
     }
 
     private async Task HandleAttachmentUnselected()
@@ -140,7 +140,7 @@ public class UIController : MonoBehaviour
     {
         ClearExistingItems();
 
-        WeaponAttachmentPoint? point = Manager.Instance.CurrentAttachmentPoint;
+        AttachmentPoint? point = Manager.Instance.CurrentAttachmentPoint;
 
         if (point == null)
             return;
@@ -180,7 +180,7 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void ShowPanel(WeaponAttachmentPoint point, bool isInstant = false)
+    public void ShowPanel()
     {
         if (_isPanelShown == true)
             return;

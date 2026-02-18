@@ -12,8 +12,8 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     WeaponAttachment _weaponBody = null!;
 
-    [SerializeField]
-    HashSet<int> _currentAttachmentIDList = new();
+    private HashSet<AttachmentPoint> _currentAttachmentPoints = new();
+    private HashSet<WeaponAttachment> _currentAttachments = new();
 
     private void Start()
     {
@@ -27,11 +27,13 @@ public class Weapon : MonoBehaviour
     }
 
     public WeaponData WeaponData => _weaponData;
-    public HashSet<int> CurrentAttachmentIDList => _currentAttachmentIDList;
+    public HashSet<AttachmentPoint> CurrentAttachmentPoints => _currentAttachmentPoints;
+    public HashSet<WeaponAttachment> CurrentAttachments => _currentAttachments;
 
     private void RefreshAttachmentList()
     {
-        _currentAttachmentIDList = _weaponBody.GetCurrentAttachmentIDList();
+        _currentAttachmentPoints = _weaponBody.FetchAttachmentSlots();
+        _currentAttachments = _weaponBody.FetchEquippedAttachments();
 
         Events.OnUpdateUI.Invoke();
     }

@@ -25,7 +25,7 @@ public class AttachmentPointUI
     [SerializeField]
     float _otherSelectedAlpha;
 
-    private WeaponAttachmentPoint _attachmentPoint = null!;
+    private AttachmentPoint _attachmentPoint = null!;
 
     private bool _isSelected = false;
 
@@ -59,13 +59,13 @@ public class AttachmentPointUI
         Events.OnAttachmentPointFocus.Invoke(_attachmentPoint);
     }
 
-    public void Initialize(WeaponAttachmentPoint attachmentPoint)
+    public void Initialize(AttachmentPoint attachmentPoint)
     {
         _attachmentPoint = attachmentPoint;
         _label.text = attachmentPoint.Name;
     }
 
-    private void HandleAttachmentPointFocus(WeaponAttachmentPoint attachmentPoint)
+    private void HandleAttachmentPointFocus(AttachmentPoint attachmentPoint)
     {
         if (attachmentPoint == _attachmentPoint)
             return;

@@ -24,7 +24,7 @@ public class WeaponData
 }
 
 [Serializable]
-public class WeaponAttachmentPoint : ISerializationCallbackReceiver
+public class WeaponAttachmentPoint
 {
     public string Name = "";
     public Transform Transform = null!;
@@ -33,33 +33,11 @@ public class WeaponAttachmentPoint : ISerializationCallbackReceiver
 
     public WeaponAttachment? CurrentAttachment = null;
 
-    private HashSet<int> _incompatibleAttachmentIDs;
+    public HashSet<int> IncompatibleAttachmentIDs { get; private set; } = new();
 
-    public WeaponAttachmentPoint()
+    public void Initialize()
     {
-        _incompatibleAttachmentIDs = new();
-    }
-
-    public HashSet<int> IncompatibleAttachmentIDs => _incompatibleAttachmentIDs;
-
-    public void OnAfterDeserialize()
-    {
-        // Update the incompatible attachment IDs after deserialization to ensure they are in sync with the IncompatibleAttachments list.
-        _incompatibleAttachmentIDs = IncompatibleAttachments.Select(a => a.ID).ToHashSet();
-    }
-
-    public void OnBeforeSerialize()
-    {
-        // Required by ISerializationCallbackReceiver.
-    }
-
-    public void AddIncompatibleAttachment(WeaponAttachment attachment)
-    {
-        if (!IncompatibleAttachments.Contains(attachment))
-        {
-            IncompatibleAttachments.Add(attachment);
-            _incompatibleAttachmentIDs.Add(attachment.ID);
-        }
+        IncompatibleAttachmentIDs = IncompatibleAttachments.Select(a => a.ID).ToHashSet();
     }
 
     public void RemoveCurrentAttachment(bool notify = true)

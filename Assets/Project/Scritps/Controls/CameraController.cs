@@ -58,7 +58,7 @@ public class CameraController : MonoBehaviour
         Events.OnAttachmentPointFocus.AddListener(
             (attachmentPoint) =>
             {
-                SetTarget(attachmentPoint.Transform);
+                SetTarget(attachmentPoint.transform);
             }
         );
 

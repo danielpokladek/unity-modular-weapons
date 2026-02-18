@@ -22,7 +22,7 @@ public class Manager : MonoBehaviour
 
     public static Manager Instance { get; private set; }
 
-    private WeaponAttachmentPoint? _currentAttachmentPoint;
+    private AttachmentPoint? _currentAttachmentPoint;
 
     private void Awake()
     {
@@ -39,7 +39,7 @@ public class Manager : MonoBehaviour
     public AttachmentPointUI AttachmentPointUIPrefab => _attachmentPointUIPrefab;
 
     public bool IsAttachmentSelected => _currentAttachmentPoint != null;
-    public WeaponAttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;
+    public AttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;
 
     public Weapon? CurrentWeapon => _currentWeapon;
 }
