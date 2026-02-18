@@ -41,27 +41,6 @@ public class WeaponAttachment : MonoBehaviour
             return;
         }
 
-        Weapon? currentWeapon = Manager.Instance.CurrentWeapon;
-
-        foreach (var point in _attachmentPoints)
-        {
-            // point.Initialize();
-
-            if (currentWeapon != null)
-            {
-                // bool isIncompatible = currentWeapon.CurrentAttachmentIDList.Any(id =>
-                //     point.IncompatibleAttachmentIDs.Contains(id)
-                // );
-
-                bool isIncompatible = false;
-
-                if (isIncompatible)
-                    continue;
-            }
-
-            Manager.Instance.UIController.RegisterAttachmentToUI(point);
-        }
-
         _explodeDirection = GetAxisDirection(transform.parent.position);
         _originalPosition = transform.localPosition;
 
@@ -70,9 +49,6 @@ public class WeaponAttachment : MonoBehaviour
             Events.OnExplodeWeapon.AddListener(ExplodeAttachment);
             Events.OnCompactWeapon.AddListener(CompactAttachment);
         }
-
-        // TODO: This should probably live in UI controller.
-        // Events.OnUpdateUI.AddListener(RefreshAttachments);
     }
 
     public void HandleCleanup()
@@ -87,14 +63,12 @@ public class WeaponAttachment : MonoBehaviour
 
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
-        // Events.OnUpdateUI.RemoveListener(RefreshAttachments);
     }
 
     private void OnDestroy()
     {
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
-        // Events.OnUpdateUI.RemoveListener(RefreshAttachments);
     }
 
     public HashSet<WeaponAttachment> FetchEquippedAttachments()
@@ -176,32 +150,5 @@ public class WeaponAttachment : MonoBehaviour
     private void CompactAttachment()
     {
         Tween.LocalPosition(transform, _originalPosition, 0.25f);
-    }
-
-    private void RefreshAttachments()
-    {
-        Weapon? currentWeapon = Manager.Instance.CurrentWeapon;
-
-        if (currentWeapon == null)
-            return;
-
-        var currentAttachmentPoints = currentWeapon.CurrentAttachmentPoints;
-        var currentAttachments = currentWeapon.CurrentAttachments;
-
-        foreach (var point in _attachmentPoints)
-        {
-            var isIncompatible = currentAttachmentPoints.Any(a =>
-                point.IncompatibleAttachmentPoints.Contains(a)
-            );
-
-            if (isIncompatible)
-            {
-                Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
-            }
-            else
-            {
-                Manager.Instance.UIController.RegisterAttachmentToUI(point);
-            }
-        }
     }
 }

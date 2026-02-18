@@ -32,6 +32,7 @@ public class AttachmentPoint : MonoBehaviour
         IncompatibleAttachments = _incompatibleAttachments.ToHashSet();
 
         Events.OnUpdateUI.AddListener(Refresh);
+        Refresh();
     }
 
     private void OnDestroy()
@@ -87,15 +88,15 @@ public class AttachmentPoint : MonoBehaviour
         var currentAttachmentPoints = currentWeapon.CurrentAttachmentPoints;
         var currentAttachments = currentWeapon.CurrentAttachments;
 
-        var isIncompatibleWithPoint = currentAttachmentPoints.Any(p =>
-            IncompatibleAttachmentPoints.Any(p => p)
+        var isIncompatibleWithPoint = currentAttachmentPoints.Where(p =>
+            IncompatibleAttachmentPoints.Contains(p) && p.CurrentAttachment != null
         );
 
-        var isIncompatibleWithAttachment = currentAttachments.Any(a =>
+        var isIncompatibleWithAttachment = currentAttachments.Where(a =>
             IncompatibleAttachments.Any(b => a.ID == b.ID)
         );
 
-        if (isIncompatibleWithPoint || isIncompatibleWithAttachment)
+        if (isIncompatibleWithPoint.Count() > 0 || isIncompatibleWithAttachment.Count() > 0)
         {
             Manager.Instance.UIController.UnregisterAttachmentFromUI(this);
         }
