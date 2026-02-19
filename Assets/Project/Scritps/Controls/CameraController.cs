@@ -35,6 +35,7 @@ public class CameraController : MonoBehaviour
     private float _distance;
 
     private bool _isRotating;
+    private bool _isPanning;
 
     private void Start()
     {
@@ -43,11 +44,16 @@ public class CameraController : MonoBehaviour
         _actions = Controls.InputActions.Camera;
         _manager = Manager.Instance;
 
-        _isRotating = false;
         _distance = _maxDistance;
 
-        _actions.Rotate.performed += ctx => _isRotating = true;
-        _actions.Rotate.canceled += ctx => _isRotating = false;
+        _isRotating = false;
+        _isPanning = false;
+
+        _actions.Pan.performed += _ => _isPanning = true;
+        _actions.Pan.canceled += _ => _isPanning = false;
+
+        _actions.Rotate.performed += _ => _isRotating = true;
+        _actions.Rotate.canceled += _ => _isRotating = false;
 
         _actions.MoveDelta.performed += ctx => _mouseDelta = ctx.ReadValue<Vector2>();
         _actions.MoveDelta.canceled += _ => _mouseDelta = Vector2.zero;
@@ -55,10 +61,15 @@ public class CameraController : MonoBehaviour
         _actions.ZoomDelta.performed += ctx => _scrollInput = ctx.ReadValue<Vector2>();
         _actions.ZoomDelta.canceled += _ => _scrollInput = Vector2.zero;
 
+        _actions.ResetCamera.performed += _ => MoveTo(_weaponContainer);
+
         Events.OnAttachmentPointFocus.AddListener(
             (attachmentPoint) =>
             {
-                SetTarget(attachmentPoint.transform);
+                if (!_manager.Settings.AutoZoomToAttachment)
+                    return;
+
+                MoveTo(attachmentPoint.transform);
             }
         );
 
@@ -69,7 +80,22 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_isRotating && _mouseDelta.sqrMagnitude > 0f)
+        if (_isPanning && _isRotating)
+            return;
+
+        bool hasMovedMouse = _mouseDelta.sqrMagnitude > 0f;
+
+        if (_isPanning && hasMovedMouse)
+        {
+            Vector3 pan =
+                0.1f
+                * Time.deltaTime
+                * (transform.right * -_mouseDelta.x + transform.up * -_mouseDelta.y);
+
+            _pivot.position += pan;
+        }
+
+        if (_isRotating && hasMovedMouse)
         {
             transform.RotateAround(
                 _pivot.position,
@@ -93,10 +119,8 @@ public class CameraController : MonoBehaviour
         transform.LookAt(_pivot);
     }
 
-    public void SetTarget(Transform target)
+    public void MoveTo(Transform target)
     {
-        _target = target;
-
         Sequence
             .Create()
             .Group(Tween.Position(_pivot, GetPivotPosition(target.position), duration: 0.25f))
