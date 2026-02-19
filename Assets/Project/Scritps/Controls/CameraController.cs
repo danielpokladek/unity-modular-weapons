@@ -27,8 +27,6 @@ public class CameraController : MonoBehaviour
     private InputSystem_Actions.CameraActions _actions;
     private Manager _manager;
 
-    private Transform _target = null!;
-
     private Vector2 _mouseDelta;
     private Vector2 _scrollInput;
 
@@ -39,8 +37,6 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        _target = _weaponContainer;
-
         _actions = Controls.InputActions.Camera;
         _manager = Manager.Instance;
 
@@ -73,17 +69,15 @@ public class CameraController : MonoBehaviour
             }
         );
 
-        // Events.OnAttachmentPointUnfocus.AddListener(() => SetTarget(_weaponContainer));
-
         _actions.Enable();
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         if (_isPanning && _isRotating)
             return;
 
-        bool hasMovedMouse = _mouseDelta.sqrMagnitude > 0f;
+        bool hasMovedMouse = _mouseDelta.sqrMagnitude > 0.1f;
 
         if (_isPanning && hasMovedMouse)
         {

@@ -31,6 +31,9 @@ public class UIController : MonoBehaviour
     StatsPanelController _statsPanel;
 
     [SerializeField]
+    MenuController _menuPanel;
+
+    [SerializeField]
     CanvasGroup _pointsCanvasGroup;
 
     [Header("Buttons")]
@@ -54,7 +57,7 @@ public class UIController : MonoBehaviour
 
     private void Awake()
     {
-        // _menuButton.onClick.AddListener(HandleMenuButtonPressed);
+        _menuButton.onClick.AddListener(() => _menuPanel.ToggleMenu());
         _statsButton.onClick.AddListener(_statsPanel.ToggleStatsPanel);
         _explodeButton.onClick.AddListener(HandleExplodeButtonPressed);
 
@@ -72,6 +75,7 @@ public class UIController : MonoBehaviour
 
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
+        _menuPanel.ToggleMenu(true);
         HidePanel(true);
     }
 

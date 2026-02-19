@@ -34,7 +34,6 @@ public class Manager : MonoBehaviour
     private void Awake()
     {
         _settings = LoadSettings();
-        SaveSettings();
 
         Instance = this;
 
@@ -61,7 +60,8 @@ public class Manager : MonoBehaviour
     {
         var settings = new AppSettings
         {
-            AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment", 1) != 0,
+            // AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment", 1) != 0,
+            AutoZoomToAttachment = true,
         };
 
         return settings;
