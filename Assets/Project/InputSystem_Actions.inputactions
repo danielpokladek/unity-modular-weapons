@@ -3,36 +3,117 @@
     "name": "InputSystem_Actions",
     "maps": [
         {
-            "name": "UI",
-            "id": "272f6d14-89ba-496f-b7ff-215263d3219f",
+            "name": "Camera",
+            "id": "53c4a46a-7309-4671-b83d-eafadfecfd88",
             "actions": [
                 {
-                    "name": "Rotate Axis",
+                    "name": "Move Delta",
                     "type": "Value",
-                    "id": "5391bb34-2710-4774-a93c-72155aea023d",
+                    "id": "a0a9c3ec-ead8-447e-8380-9c60b836b4c7",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Rotate Button",
+                    "name": "Zoom Delta",
+                    "type": "Value",
+                    "id": "b016ed0d-1922-4a7e-a754-aff171783a02",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Pan",
                     "type": "Button",
-                    "id": "13740b1b-a31b-4660-aa36-ace7a914e526",
+                    "id": "f6cccb4c-2ede-4e06-8851-f3fcefc3b36d",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Zoom Axis",
-                    "type": "Value",
-                    "id": "0abe57f5-ca76-4380-8f70-5a1d25a447e1",
-                    "expectedControlType": "Vector2",
+                    "name": "Rotate",
+                    "type": "Button",
+                    "id": "8eaf7eb6-5131-43a9-9bd9-e2dd8e9bfc24",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
                 },
+                {
+                    "name": "Reset Camera",
+                    "type": "Button",
+                    "id": "77cb5542-a162-4d40-9edb-8e0f13bdb8aa",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "63597bd7-f093-4bec-ae5e-0435870c095a",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pan",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "49dcbcec-6275-46c9-a567-d4bf4968ab30",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Move Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3d586e73-1f92-4043-9cb0-1367f73666fd",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Rotate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "59cf33f8-e241-443e-8106-385dc272291b",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Zoom Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5fb63f84-c1ff-4974-b023-fb1548dd8846",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Reset Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "272f6d14-89ba-496f-b7ff-215263d3219f",
+            "actions": [
                 {
                     "name": "Toggle UI",
                     "type": "Button",
@@ -44,39 +125,6 @@
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "fd905629-93f9-4ef2-8a71-71f43a5ef5d1",
-                    "path": "<Mouse>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Rotate Axis",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f216bcc8-692f-4f78-ade1-44c9dae9f1dd",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Rotate Button",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "5bf0446d-b85f-4c7e-98f2-0babdd0dde55",
-                    "path": "<Mouse>/scroll",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Zoom Axis",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "",
                     "id": "0c055402-36e1-4946-9aff-e209db259f29",

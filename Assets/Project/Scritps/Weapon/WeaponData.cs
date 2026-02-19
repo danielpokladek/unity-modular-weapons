@@ -13,14 +13,16 @@ public enum FireMode
 }
 
 [Serializable]
-public class WeaponData
+public class WeaponStats
 {
-    public float RateOfFire;
-    public float MagazineSize;
+    public float Weight;
+    public float Ergonomics;
     public float Accuracy;
-    public float Stability;
-    public float Range;
-    public float ReloadTime;
+    public float SightingRange;
+    public float VerticalRecoil;
+    public float HorizontalRecoil;
+    public float FireRate;
+    public float EffectiveDistance;
 }
 
 [Serializable]

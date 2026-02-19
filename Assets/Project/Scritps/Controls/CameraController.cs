@@ -24,12 +24,12 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     float _maxDistance = 0.8f;
 
-    private InputSystem_Actions.UIActions _actions;
+    private InputSystem_Actions.CameraActions _actions;
     private Manager _manager;
 
     private Transform _target = null!;
 
-    private Vector2 _lookInput;
+    private Vector2 _mouseDelta;
     private Vector2 _scrollInput;
 
     private float _distance;
@@ -40,20 +40,20 @@ public class CameraController : MonoBehaviour
     {
         _target = _weaponContainer;
 
-        _actions = Controls.InputActions.UI;
+        _actions = Controls.InputActions.Camera;
         _manager = Manager.Instance;
 
         _isRotating = false;
         _distance = _maxDistance;
 
-        _actions.RotateButton.performed += ctx => _isRotating = true;
-        _actions.RotateButton.canceled += ctx => _isRotating = false;
+        _actions.Rotate.performed += ctx => _isRotating = true;
+        _actions.Rotate.canceled += ctx => _isRotating = false;
 
-        _actions.RotateAxis.performed += ctx => _lookInput = ctx.ReadValue<Vector2>();
-        _actions.RotateAxis.canceled += _ => _lookInput = Vector2.zero;
+        _actions.MoveDelta.performed += ctx => _mouseDelta = ctx.ReadValue<Vector2>();
+        _actions.MoveDelta.canceled += _ => _mouseDelta = Vector2.zero;
 
-        _actions.ZoomAxis.performed += ctx => _scrollInput = ctx.ReadValue<Vector2>();
-        _actions.ZoomAxis.canceled += _ => _scrollInput = Vector2.zero;
+        _actions.ZoomDelta.performed += ctx => _scrollInput = ctx.ReadValue<Vector2>();
+        _actions.ZoomDelta.canceled += _ => _scrollInput = Vector2.zero;
 
         Events.OnAttachmentPointFocus.AddListener(
             (attachmentPoint) =>
@@ -62,24 +62,24 @@ public class CameraController : MonoBehaviour
             }
         );
 
-        Events.OnAttachmentPointUnfocus.AddListener(() => SetTarget(_weaponContainer));
+        // Events.OnAttachmentPointUnfocus.AddListener(() => SetTarget(_weaponContainer));
 
         _actions.Enable();
     }
 
     private void LateUpdate()
     {
-        if (_isRotating && _lookInput.sqrMagnitude > 0f)
+        if (_isRotating && _mouseDelta.sqrMagnitude > 0f)
         {
             transform.RotateAround(
                 _pivot.position,
                 Vector3.up,
-                _lookInput.x * _sensitivity * Time.deltaTime
+                _mouseDelta.x * _sensitivity * Time.deltaTime
             );
             transform.RotateAround(
                 _pivot.position,
                 transform.right,
-                -_lookInput.y * _sensitivity * Time.deltaTime
+                -_mouseDelta.y * _sensitivity * Time.deltaTime
             );
         }
 

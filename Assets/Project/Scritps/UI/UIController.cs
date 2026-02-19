@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PrimeTween;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
@@ -25,8 +26,22 @@ public class UIController : MonoBehaviour
     [SerializeField]
     Sprite _removeAttachmentIcon;
 
+    [Header("References")]
+    [SerializeField]
+    StatsPanelController _statsPanel;
+
     [SerializeField]
     CanvasGroup _pointsCanvasGroup;
+
+    [Header("Buttons")]
+    [SerializeField]
+    Button _menuButton = null!;
+
+    [SerializeField]
+    Button _statsButton = null!;
+
+    [SerializeField]
+    Button _explodeButton = null!;
 
     private Dictionary<AttachmentPoint, Transform> _attachmentDictionary = new();
 
@@ -39,11 +54,23 @@ public class UIController : MonoBehaviour
 
     private bool _exploded = false;
 
-    private void Start()
+    private void Awake()
     {
+        // _menuButton.onClick.AddListener(HandleMenuButtonPressed);
+        _statsButton.onClick.AddListener(_statsPanel.ToggleStatsPanel);
+        _explodeButton.onClick.AddListener(HandleExplodeButtonPressed);
+
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
         Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
         Events.OnAttachmentChanged.AddListener(RefreshButtonList);
+
+        Events.OnUpdateUI.AddListener(() =>
+        {
+            if (Manager.Instance.CurrentWeapon == null)
+                return;
+
+            _statsPanel.UpdateStats(Manager.Instance.CurrentWeapon.Stats);
+        });
 
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
@@ -70,6 +97,8 @@ public class UIController : MonoBehaviour
             }
         }
     }
+
+    public StatsPanelController StatsPanel => _statsPanel;
 
     public void HandleExplodeButtonPressed()
     {
@@ -149,7 +178,7 @@ public class UIController : MonoBehaviour
             return;
 
         var removeButton = GetAttachmentButton();
-        removeButton.ItemImage.sprite = _removeAttachmentIcon;
+        removeButton.Initialize(_removeAttachmentIcon, "NONE", true);
         removeButton.Button.onClick.AddListener(() =>
         {
             point.RemoveCurrentAttachment();
@@ -163,7 +192,7 @@ public class UIController : MonoBehaviour
         foreach (var attachment in point.AvailableAttachments)
         {
             var attachmentButton = GetAttachmentButton();
-            attachmentButton.ItemImage.sprite = attachment.UISprite;
+            attachmentButton.Initialize(attachment.UISprite, attachment.Name);
 
             attachmentButton.Button.onClick.AddListener(() =>
             {
@@ -185,13 +214,13 @@ public class UIController : MonoBehaviour
 
     public void ShowPanel(string attachmentName)
     {
+        if (_isPanelShown != true)
+        {
+            _isPanelShown = true;
+            _itemsPanel.gameObject.SetActive(true);
+        }
+
         _itemsPanelHeading.text = attachmentName;
-
-        if (_isPanelShown == true)
-            return;
-
-        _isPanelShown = true;
-        _itemsPanel.gameObject.SetActive(true);
     }
 
     private void HidePanel(bool isInstant = false)

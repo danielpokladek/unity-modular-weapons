@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using PrimeTween;
 using Unity.VisualScripting;
@@ -10,10 +9,16 @@ public class WeaponAttachment : MonoBehaviour
 {
     [Header("Attachment Properties")]
     [SerializeField]
+    string _name = "";
+
+    [SerializeField]
     bool _canBeRemoved = true;
 
     [SerializeField]
     List<AttachmentPoint> _attachmentPoints = new();
+
+    [SerializeField]
+    WeaponStats _statsModifiers;
 
     [Header("Auto Assigned")]
     [SerializeField]
@@ -25,7 +30,11 @@ public class WeaponAttachment : MonoBehaviour
     private Vector3 _explodeDirection;
     private Vector3 _originalPosition;
 
+    public string Name => _name;
+
     public List<AttachmentPoint> AttachmentPoints => _attachmentPoints;
+
+    public WeaponStats StatsModifiers => _statsModifiers;
 
     public Sprite UISprite => _uiSprite;
 
@@ -159,7 +168,7 @@ public class WeaponAttachment : MonoBehaviour
 
     private void ExplodeAttachment()
     {
-        Tween.LocalPosition(transform, _explodeDirection * 0.3f, 0.25f);
+        Tween.LocalPosition(transform, _explodeDirection * 0.1f, 0.25f);
     }
 
     private void CompactAttachment()

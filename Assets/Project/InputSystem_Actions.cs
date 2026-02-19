@@ -89,36 +89,117 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     ""name"": ""InputSystem_Actions"",
     ""maps"": [
         {
-            ""name"": ""UI"",
-            ""id"": ""272f6d14-89ba-496f-b7ff-215263d3219f"",
+            ""name"": ""Camera"",
+            ""id"": ""53c4a46a-7309-4671-b83d-eafadfecfd88"",
             ""actions"": [
                 {
-                    ""name"": ""Rotate Axis"",
+                    ""name"": ""Move Delta"",
                     ""type"": ""Value"",
-                    ""id"": ""5391bb34-2710-4774-a93c-72155aea023d"",
+                    ""id"": ""a0a9c3ec-ead8-447e-8380-9c60b836b4c7"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Rotate Button"",
+                    ""name"": ""Zoom Delta"",
+                    ""type"": ""Value"",
+                    ""id"": ""b016ed0d-1922-4a7e-a754-aff171783a02"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Pan"",
                     ""type"": ""Button"",
-                    ""id"": ""13740b1b-a31b-4660-aa36-ace7a914e526"",
+                    ""id"": ""f6cccb4c-2ede-4e06-8851-f3fcefc3b36d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Zoom Axis"",
-                    ""type"": ""Value"",
-                    ""id"": ""0abe57f5-ca76-4380-8f70-5a1d25a447e1"",
-                    ""expectedControlType"": ""Vector2"",
+                    ""name"": ""Rotate"",
+                    ""type"": ""Button"",
+                    ""id"": ""8eaf7eb6-5131-43a9-9bd9-e2dd8e9bfc24"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": true
+                    ""initialStateCheck"": false
                 },
+                {
+                    ""name"": ""Reset Camera"",
+                    ""type"": ""Button"",
+                    ""id"": ""77cb5542-a162-4d40-9edb-8e0f13bdb8aa"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""63597bd7-f093-4bec-ae5e-0435870c095a"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pan"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""49dcbcec-6275-46c9-a567-d4bf4968ab30"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Move Delta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3d586e73-1f92-4043-9cb0-1367f73666fd"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59cf33f8-e241-443e-8106-385dc272291b"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Zoom Delta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5fb63f84-c1ff-4974-b023-fb1548dd8846"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Reset Camera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""UI"",
+            ""id"": ""272f6d14-89ba-496f-b7ff-215263d3219f"",
+            ""actions"": [
                 {
                     ""name"": ""Toggle UI"",
                     ""type"": ""Button"",
@@ -130,39 +211,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""fd905629-93f9-4ef2-8a71-71f43a5ef5d1"",
-                    ""path"": ""<Mouse>/delta"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Rotate Axis"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f216bcc8-692f-4f78-ade1-44c9dae9f1dd"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Rotate Button"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""5bf0446d-b85f-4c7e-98f2-0babdd0dde55"",
-                    ""path"": ""<Mouse>/scroll"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Zoom Axis"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": """",
                     ""id"": ""0c055402-36e1-4946-9aff-e209db259f29"",
@@ -240,16 +288,21 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     ]
 }");
+        // Camera
+        m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
+        m_Camera_MoveDelta = m_Camera.FindAction("Move Delta", throwIfNotFound: true);
+        m_Camera_ZoomDelta = m_Camera.FindAction("Zoom Delta", throwIfNotFound: true);
+        m_Camera_Pan = m_Camera.FindAction("Pan", throwIfNotFound: true);
+        m_Camera_Rotate = m_Camera.FindAction("Rotate", throwIfNotFound: true);
+        m_Camera_ResetCamera = m_Camera.FindAction("Reset Camera", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
-        m_UI_RotateAxis = m_UI.FindAction("Rotate Axis", throwIfNotFound: true);
-        m_UI_RotateButton = m_UI.FindAction("Rotate Button", throwIfNotFound: true);
-        m_UI_ZoomAxis = m_UI.FindAction("Zoom Axis", throwIfNotFound: true);
         m_UI_ToggleUI = m_UI.FindAction("Toggle UI", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
+        UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Camera.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
     }
 
@@ -323,12 +376,149 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
+    // Camera
+    private readonly InputActionMap m_Camera;
+    private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
+    private readonly InputAction m_Camera_MoveDelta;
+    private readonly InputAction m_Camera_ZoomDelta;
+    private readonly InputAction m_Camera_Pan;
+    private readonly InputAction m_Camera_Rotate;
+    private readonly InputAction m_Camera_ResetCamera;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Camera".
+    /// </summary>
+    public struct CameraActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public CameraActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/MoveDelta".
+        /// </summary>
+        public InputAction @MoveDelta => m_Wrapper.m_Camera_MoveDelta;
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/ZoomDelta".
+        /// </summary>
+        public InputAction @ZoomDelta => m_Wrapper.m_Camera_ZoomDelta;
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/Pan".
+        /// </summary>
+        public InputAction @Pan => m_Wrapper.m_Camera_Pan;
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/Rotate".
+        /// </summary>
+        public InputAction @Rotate => m_Wrapper.m_Camera_Rotate;
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/ResetCamera".
+        /// </summary>
+        public InputAction @ResetCamera => m_Wrapper.m_Camera_ResetCamera;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Camera; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="CameraActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="CameraActions" />
+        public void AddCallbacks(ICameraActions instance)
+        {
+            if (instance == null || m_Wrapper.m_CameraActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CameraActionsCallbackInterfaces.Add(instance);
+            @MoveDelta.started += instance.OnMoveDelta;
+            @MoveDelta.performed += instance.OnMoveDelta;
+            @MoveDelta.canceled += instance.OnMoveDelta;
+            @ZoomDelta.started += instance.OnZoomDelta;
+            @ZoomDelta.performed += instance.OnZoomDelta;
+            @ZoomDelta.canceled += instance.OnZoomDelta;
+            @Pan.started += instance.OnPan;
+            @Pan.performed += instance.OnPan;
+            @Pan.canceled += instance.OnPan;
+            @Rotate.started += instance.OnRotate;
+            @Rotate.performed += instance.OnRotate;
+            @Rotate.canceled += instance.OnRotate;
+            @ResetCamera.started += instance.OnResetCamera;
+            @ResetCamera.performed += instance.OnResetCamera;
+            @ResetCamera.canceled += instance.OnResetCamera;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="CameraActions" />
+        private void UnregisterCallbacks(ICameraActions instance)
+        {
+            @MoveDelta.started -= instance.OnMoveDelta;
+            @MoveDelta.performed -= instance.OnMoveDelta;
+            @MoveDelta.canceled -= instance.OnMoveDelta;
+            @ZoomDelta.started -= instance.OnZoomDelta;
+            @ZoomDelta.performed -= instance.OnZoomDelta;
+            @ZoomDelta.canceled -= instance.OnZoomDelta;
+            @Pan.started -= instance.OnPan;
+            @Pan.performed -= instance.OnPan;
+            @Pan.canceled -= instance.OnPan;
+            @Rotate.started -= instance.OnRotate;
+            @Rotate.performed -= instance.OnRotate;
+            @Rotate.canceled -= instance.OnRotate;
+            @ResetCamera.started -= instance.OnResetCamera;
+            @ResetCamera.performed -= instance.OnResetCamera;
+            @ResetCamera.canceled -= instance.OnResetCamera;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="CameraActions.UnregisterCallbacks(ICameraActions)" />.
+        /// </summary>
+        /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
+        public void RemoveCallbacks(ICameraActions instance)
+        {
+            if (m_Wrapper.m_CameraActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="CameraActions.AddCallbacks(ICameraActions)" />
+        /// <seealso cref="CameraActions.RemoveCallbacks(ICameraActions)" />
+        /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
+        public void SetCallbacks(ICameraActions instance)
+        {
+            foreach (var item in m_Wrapper.m_CameraActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_CameraActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
+    /// </summary>
+    public CameraActions @Camera => new CameraActions(this);
+
     // UI
     private readonly InputActionMap m_UI;
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
-    private readonly InputAction m_UI_RotateAxis;
-    private readonly InputAction m_UI_RotateButton;
-    private readonly InputAction m_UI_ZoomAxis;
     private readonly InputAction m_UI_ToggleUI;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
@@ -341,18 +531,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
         public UIActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
-        /// <summary>
-        /// Provides access to the underlying input action "UI/RotateAxis".
-        /// </summary>
-        public InputAction @RotateAxis => m_Wrapper.m_UI_RotateAxis;
-        /// <summary>
-        /// Provides access to the underlying input action "UI/RotateButton".
-        /// </summary>
-        public InputAction @RotateButton => m_Wrapper.m_UI_RotateButton;
-        /// <summary>
-        /// Provides access to the underlying input action "UI/ZoomAxis".
-        /// </summary>
-        public InputAction @ZoomAxis => m_Wrapper.m_UI_ZoomAxis;
         /// <summary>
         /// Provides access to the underlying input action "UI/ToggleUI".
         /// </summary>
@@ -383,15 +561,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_UIActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_UIActionsCallbackInterfaces.Add(instance);
-            @RotateAxis.started += instance.OnRotateAxis;
-            @RotateAxis.performed += instance.OnRotateAxis;
-            @RotateAxis.canceled += instance.OnRotateAxis;
-            @RotateButton.started += instance.OnRotateButton;
-            @RotateButton.performed += instance.OnRotateButton;
-            @RotateButton.canceled += instance.OnRotateButton;
-            @ZoomAxis.started += instance.OnZoomAxis;
-            @ZoomAxis.performed += instance.OnZoomAxis;
-            @ZoomAxis.canceled += instance.OnZoomAxis;
             @ToggleUI.started += instance.OnToggleUI;
             @ToggleUI.performed += instance.OnToggleUI;
             @ToggleUI.canceled += instance.OnToggleUI;
@@ -406,15 +575,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UIActions" />
         private void UnregisterCallbacks(IUIActions instance)
         {
-            @RotateAxis.started -= instance.OnRotateAxis;
-            @RotateAxis.performed -= instance.OnRotateAxis;
-            @RotateAxis.canceled -= instance.OnRotateAxis;
-            @RotateButton.started -= instance.OnRotateButton;
-            @RotateButton.performed -= instance.OnRotateButton;
-            @RotateButton.canceled -= instance.OnRotateButton;
-            @ZoomAxis.started -= instance.OnZoomAxis;
-            @ZoomAxis.performed -= instance.OnZoomAxis;
-            @ZoomAxis.canceled -= instance.OnZoomAxis;
             @ToggleUI.started -= instance.OnToggleUI;
             @ToggleUI.performed -= instance.OnToggleUI;
             @ToggleUI.canceled -= instance.OnToggleUI;
@@ -517,33 +677,55 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="CameraActions.AddCallbacks(ICameraActions)" />
+    /// <seealso cref="CameraActions.RemoveCallbacks(ICameraActions)" />
+    public interface ICameraActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Move Delta" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveDelta(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Zoom Delta" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnZoomDelta(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Pan" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPan(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Rotate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRotate(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Reset Camera" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnResetCamera(InputAction.CallbackContext context);
+    }
+    /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
     /// </summary>
     /// <seealso cref="UIActions.AddCallbacks(IUIActions)" />
     /// <seealso cref="UIActions.RemoveCallbacks(IUIActions)" />
     public interface IUIActions
     {
-        /// <summary>
-        /// Method invoked when associated input action "Rotate Axis" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRotateAxis(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Rotate Button" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRotateButton(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Zoom Axis" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnZoomAxis(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Toggle UI" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
