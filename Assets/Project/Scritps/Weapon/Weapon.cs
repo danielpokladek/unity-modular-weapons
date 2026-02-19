@@ -15,23 +15,38 @@ public class Weapon : MonoBehaviour
     private HashSet<AttachmentPoint> _currentAttachmentPoints = new();
     private HashSet<WeaponAttachment> _currentAttachments = new();
 
+    private bool _isExploded = false;
+
     private void Start()
     {
-        RefreshAttachmentList();
-        Events.OnAttachmentChanged.AddListener(RefreshAttachmentList);
+        HandleAttachmentChanged();
+        Events.OnAttachmentChanged.AddListener(HandleAttachmentChanged);
+
+        Events.OnExplodeWeapon.AddListener((_) => _isExploded = true);
+        Events.OnCompactWeapon.AddListener((_) => _isExploded = false);
     }
 
     private void OnDestroy()
     {
-        Events.OnAttachmentChanged.RemoveListener(RefreshAttachmentList);
+        Events.OnAttachmentChanged.RemoveListener(HandleAttachmentChanged);
+
+        Events.OnExplodeWeapon.RemoveAllListeners();
+        Events.OnCompactWeapon.RemoveAllListeners();
     }
 
     public WeaponStats Stats => _weaponData;
     public HashSet<AttachmentPoint> CurrentAttachmentPoints => _currentAttachmentPoints;
     public HashSet<WeaponAttachment> CurrentAttachments => _currentAttachments;
 
-    private void RefreshAttachmentList()
+    public bool IsExploded => _isExploded;
+
+    private void HandleAttachmentChanged()
     {
+        if (_isExploded)
+        {
+            Events.OnCompactWeapon.Invoke(true);
+        }
+
         _currentAttachmentPoints = _weaponBody.FetchAttachmentSlots();
         _currentAttachments = _weaponBody.FetchEquippedAttachments();
 

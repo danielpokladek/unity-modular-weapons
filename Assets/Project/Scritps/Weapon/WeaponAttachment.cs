@@ -50,7 +50,10 @@ public class WeaponAttachment : MonoBehaviour
             return;
         }
 
-        _explodeDirection = GetAxisDirection(transform.parent.position);
+        // TODO: In actual project this would be removed and used by stats from inspector.
+        GenerateRandomWeaponStats();
+
+        _explodeDirection = GetAxisDirection(transform.position);
         _originalPosition = transform.localPosition;
 
         if (CanBeRemoved)
@@ -166,13 +169,23 @@ public class WeaponAttachment : MonoBehaviour
         return result.normalized;
     }
 
-    private void ExplodeAttachment()
+    private void ExplodeAttachment(bool isInstant)
     {
-        Tween.LocalPosition(transform, _explodeDirection * 0.1f, 0.25f);
+        Tween.LocalPosition(transform, _explodeDirection * 0.1f, isInstant ? 0 : 0.25f);
     }
 
-    private void CompactAttachment()
+    private void CompactAttachment(bool isInstant)
     {
-        Tween.LocalPosition(transform, _originalPosition, 0.25f);
+        Tween.LocalPosition(transform, _originalPosition, isInstant ? 0 : 0.25f);
+    }
+
+    private void GenerateRandomWeaponStats()
+    {
+        _statsModifiers.Weight = Random.Range(0.2f, 0.4f);
+        _statsModifiers.Accuracy = Random.Range(0, 350);
+        _statsModifiers.SightingRange = Random.Range(0, 80);
+        _statsModifiers.VerticalRecoil = Random.Range(0, 150);
+        _statsModifiers.HorizontalRecoil = Random.Range(0, 350);
+        _statsModifiers.FireRate = Random.Range(0, 5);
     }
 }

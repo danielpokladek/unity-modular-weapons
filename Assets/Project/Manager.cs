@@ -61,7 +61,7 @@ public class Manager : MonoBehaviour
     {
         var settings = new AppSettings
         {
-            AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment") != 0,
+            AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment", 1) != 0,
         };
 
         return settings;

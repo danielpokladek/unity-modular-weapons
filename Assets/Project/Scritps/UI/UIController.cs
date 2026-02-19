@@ -52,8 +52,6 @@ public class UIController : MonoBehaviour
 
     private Tween? _uiTween;
 
-    private bool _exploded = false;
-
     private void Awake()
     {
         // _menuButton.onClick.AddListener(HandleMenuButtonPressed);
@@ -102,15 +100,16 @@ public class UIController : MonoBehaviour
 
     public void HandleExplodeButtonPressed()
     {
-        _exploded = !_exploded;
+        if (!Manager.Instance.CurrentWeapon)
+            return;
 
-        if (_exploded)
+        if (!Manager.Instance.CurrentWeapon.IsExploded)
         {
-            Events.OnExplodeWeapon.Invoke();
+            Events.OnExplodeWeapon.Invoke(false);
         }
         else
         {
-            Events.OnCompactWeapon.Invoke();
+            Events.OnCompactWeapon.Invoke(false);
         }
     }
 
