@@ -1,12 +1,32 @@
 using PrimeTween;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
     [SerializeField]
     CanvasGroup _canvasGroup;
 
+    [SerializeField]
+    Toggle _autoZoomToggle;
+
+    private Manager _manager;
+
     private Tween? _currentTween;
+
+    public void Initialize()
+    {
+        _manager = Manager.Instance;
+
+        _autoZoomToggle.isOn = _manager.Settings.AutoZoomToAttachment;
+        _autoZoomToggle.onValueChanged.AddListener(
+            (val) =>
+            {
+                _manager.Settings.AutoZoomToAttachment = val;
+                _manager.SaveSettings();
+            }
+        );
+    }
 
     public void ToggleMenu(bool isInstant = false)
     {

@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public struct AppSettings
+public class AppSettings
 {
     public bool AutoZoomToAttachment;
 }
@@ -27,23 +27,23 @@ public class Manager : MonoBehaviour
     [SerializeField]
     Weapon _currentWeapon = null!;
 
-    private AppSettings _settings;
-
     private AttachmentPoint? _currentAttachmentPoint;
 
     private void Awake()
     {
-        _settings = LoadSettings();
+        Settings = LoadSettings();
 
         Instance = this;
 
         Events.OnAttachmentPointFocus.AddListener((point) => _currentAttachmentPoint = point);
         Events.OnAttachmentPointUnfocus.AddListener(() => _currentAttachmentPoint = null);
+
+        _uiController.Initialize();
     }
 
     public static Manager Instance { get; private set; }
 
-    public AppSettings Settings => _settings;
+    public AppSettings Settings { get; private set; }
 
     public Canvas Canvas => _uiCanvas;
     public UIController UIController => _uiController;
@@ -56,19 +56,18 @@ public class Manager : MonoBehaviour
 
     public Weapon? CurrentWeapon => _currentWeapon;
 
-    private AppSettings LoadSettings()
+    public AppSettings LoadSettings()
     {
         var settings = new AppSettings
         {
-            // AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment", 1) != 0,
-            AutoZoomToAttachment = true,
+            AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment", 1) != 0,
         };
 
         return settings;
     }
 
-    private void SaveSettings()
+    public void SaveSettings()
     {
-        PlayerPrefs.SetInt("AutoZoomToAttachment", _settings.AutoZoomToAttachment ? 1 : 0);
+        PlayerPrefs.SetInt("AutoZoomToAttachment", Settings.AutoZoomToAttachment ? 1 : 0);
     }
 }

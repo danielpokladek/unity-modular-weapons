@@ -55,7 +55,7 @@ public class UIController : MonoBehaviour
 
     private Tween? _uiTween;
 
-    private void Awake()
+    public void Initialize()
     {
         _menuButton.onClick.AddListener(() => _menuPanel.ToggleMenu());
         _statsButton.onClick.AddListener(_statsPanel.ToggleStatsPanel);
@@ -75,7 +75,9 @@ public class UIController : MonoBehaviour
 
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
+        _menuPanel.Initialize();
         _menuPanel.ToggleMenu(true);
+
         HidePanel(true);
     }
 
@@ -139,14 +141,19 @@ public class UIController : MonoBehaviour
 
     public void UnregisterAttachmentFromUI(AttachmentPoint point)
     {
-        if (!_attachmentDictionary.ContainsKey(point))
-        {
+        if (point == null)
             return;
-        }
+
+        if (!_attachmentDictionary.ContainsKey(point))
+            return;
 
         // TODO: Pool those.
         Transform? uiPoint = _attachmentDictionary[point];
-        uiPoint?.SetParent(null);
+
+        if (uiPoint != null)
+        {
+            uiPoint.SetParent(null);
+        }
 
         _attachmentDictionary.Remove(point);
     }
