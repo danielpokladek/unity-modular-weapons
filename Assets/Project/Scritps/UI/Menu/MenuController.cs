@@ -28,7 +28,7 @@ public class MenuController : MonoBehaviour
         );
     }
 
-    public void ToggleMenu(bool isInstant = false)
+    public void ToggleVisibility(bool isInstant = false)
     {
         _currentTween?.Stop();
 

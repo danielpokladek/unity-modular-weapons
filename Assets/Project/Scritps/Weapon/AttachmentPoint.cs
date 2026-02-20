@@ -48,7 +48,7 @@ public class AttachmentPoint : MonoBehaviour
             return;
 
         // TODO: Pool instead of destroying.
-        CurrentAttachment.HandleCleanup();
+        CurrentAttachment.RemoveAttachment();
         Destroy(CurrentAttachment.gameObject);
         CurrentAttachment = null;
 
@@ -56,6 +56,12 @@ public class AttachmentPoint : MonoBehaviour
         {
             Events.OnAttachmentChanged.Invoke();
         }
+    }
+
+    public void Remove()
+    {
+        RemoveCurrentAttachment(false);
+        Manager.Instance.UIController.UnregisterAttachmentFromUI(this);
     }
 
     public void SetAttachment(int id)

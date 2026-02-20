@@ -54,7 +54,7 @@ public class Manager : MonoBehaviour
     public bool IsAttachmentSelected => _currentAttachmentPoint != null;
     public AttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;
 
-    public Weapon? CurrentWeapon => _currentWeapon;
+    public Weapon CurrentWeapon => _currentWeapon;
 
     public AppSettings LoadSettings()
     {

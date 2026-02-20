@@ -40,6 +40,19 @@ public class Weapon : MonoBehaviour
 
     public bool IsExploded => _isExploded;
 
+    public void ChangeBody(WeaponAttachment body)
+    {
+        _weaponBody.RemoveAttachment();
+
+        var newBody = Instantiate(body, transform);
+        newBody.transform.localPosition = Vector3.zero;
+        newBody.transform.rotation = Quaternion.identity;
+
+        _weaponBody = newBody;
+
+        Events.OnAttachmentChanged.Invoke();
+    }
+
     private void HandleAttachmentChanged()
     {
         if (_isExploded)

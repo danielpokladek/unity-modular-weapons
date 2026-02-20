@@ -34,17 +34,10 @@ public class UIController : MonoBehaviour
     MenuController _menuPanel;
 
     [SerializeField]
+    WeaponPanel _weaponPanel;
+
+    [SerializeField]
     CanvasGroup _pointsCanvasGroup;
-
-    [Header("Buttons")]
-    [SerializeField]
-    Button _menuButton = null!;
-
-    [SerializeField]
-    Button _statsButton = null!;
-
-    [SerializeField]
-    Button _explodeButton = null!;
 
     private Dictionary<AttachmentPoint, Transform> _attachmentDictionary = new();
 
@@ -57,10 +50,6 @@ public class UIController : MonoBehaviour
 
     public void Initialize()
     {
-        _menuButton.onClick.AddListener(() => _menuPanel.ToggleMenu());
-        _statsButton.onClick.AddListener(_statsPanel.ToggleStatsPanel);
-        _explodeButton.onClick.AddListener(HandleExplodeButtonPressed);
-
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
         Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
         Events.OnAttachmentChanged.AddListener(RefreshButtonList);
@@ -76,7 +65,10 @@ public class UIController : MonoBehaviour
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         _menuPanel.Initialize();
-        _menuPanel.ToggleMenu(true);
+        _menuPanel.ToggleVisibility(true);
+
+        _weaponPanel.Initialize();
+        _weaponPanel.ToggleVisibility();
 
         HidePanel(true);
     }
@@ -117,6 +109,11 @@ public class UIController : MonoBehaviour
         {
             Events.OnCompactWeapon.Invoke(false);
         }
+    }
+
+    public void HandleBodyChangeButtonPressed()
+    {
+        _weaponPanel.ToggleVisibility();
     }
 
     public void RegisterAttachmentToUI(AttachmentPoint point)

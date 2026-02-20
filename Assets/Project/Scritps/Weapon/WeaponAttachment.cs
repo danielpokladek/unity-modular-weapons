@@ -63,19 +63,7 @@ public class WeaponAttachment : MonoBehaviour
         }
     }
 
-    public void HandleCleanup()
-    {
-        foreach (var point in _attachmentPoints)
-        {
-            Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
-            point.CurrentAttachment?.HandleCleanup();
-        }
-
-        RemoveUIPoints();
-
-        Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
-        Events.OnCompactWeapon.RemoveListener(CompactAttachment);
-    }
+    public void HandleCleanup() { }
 
     private void OnDestroy()
     {
@@ -119,12 +107,17 @@ public class WeaponAttachment : MonoBehaviour
         return attachmentPoints;
     }
 
-    public void RemoveUIPoints()
+    public void RemoveAttachment()
     {
         foreach (var point in _attachmentPoints)
         {
-            Manager.Instance.UIController.UnregisterAttachmentFromUI(point);
+            point.Remove();
         }
+
+        Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
+        Events.OnCompactWeapon.RemoveListener(CompactAttachment);
+
+        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()
