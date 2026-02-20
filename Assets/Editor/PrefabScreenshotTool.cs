@@ -24,6 +24,11 @@ public static class PrefabScreenshotTool
 
     public static void Generate(PrefabScreenshotSettings settings)
     {
+        Selection.activeObject = null;
+        ActiveEditorTracker.sharedTracker.isLocked = true;
+
+        _warningCount = 0;
+
         if (!Directory.Exists(settings.PrefabFolder))
         {
             Debug.LogError($"{_debugPrefix}: Invalid prefab folder: {settings.PrefabFolder}!");
@@ -38,6 +43,12 @@ public static class PrefabScreenshotTool
         string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { settings.PrefabFolder });
         int totalFiles = guids.Length;
 
+        var originalAmbientMode = RenderSettings.ambientMode;
+        var originalAmbientLight = RenderSettings.ambientLight;
+
+        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+        RenderSettings.ambientLight = Color.white;
+
         Scene originalScene = SceneManager.GetActiveScene();
 
         Scene tempScene = EditorSceneManager.NewScene(
@@ -50,10 +61,14 @@ public static class PrefabScreenshotTool
         Light light = lightGO.AddComponent<Light>();
         light.type = LightType.Directional;
         light.transform.rotation = Quaternion.Euler(50, 30, 0);
+        light.shadows = LightShadows.None;
+        light.intensity = 1.2f;
 
         GameObject cameraGO = new("TempCamera");
         Camera camera = cameraGO.AddComponent<Camera>();
 
+        camera.allowHDR = false;
+        camera.allowMSAA = false;
         camera.orthographic = settings.IsOrthographic;
         camera.clearFlags = CameraClearFlags.Color;
         camera.backgroundColor = Color.clear;
@@ -185,8 +200,12 @@ public static class PrefabScreenshotTool
         AssetDatabase.SaveAssets();
         EditorUtility.UnloadUnusedAssetsImmediate();
 
+        RenderSettings.ambientMode = originalAmbientMode;
+        RenderSettings.ambientLight = originalAmbientLight;
+
+        ActiveEditorTracker.sharedTracker.isLocked = false;
+
         Debug.Log($"{_debugPrefix}: Complete. Generated sprites with {_warningCount} warnings.");
-        _warningCount = 0;
     }
 
     private static void TakeScreenshot(
@@ -273,10 +292,10 @@ public static class PrefabScreenshotTool
             string relativeSpritePath = GetRelativeSpritePath(path, prefabFolder, outputFolder)
                 .Replace("\\", "/");
 
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(relativeSpritePath);
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(path);
 
-            if (prefab == null || sprite == null)
+            if (prefabRoot == null || sprite == null)
             {
                 _warningCount++;
                 Debug.LogWarning(
@@ -285,29 +304,28 @@ public static class PrefabScreenshotTool
                 continue;
             }
 
-            if (prefab.TryGetComponent(out WeaponAttachment attachment))
+            try
             {
-                SerializedObject so = new(attachment);
+                var attachment = prefabRoot.GetComponentInChildren<WeaponAttachment>();
 
-                SerializedProperty spriteProp = so.FindProperty("_uiSprite");
-
-                if (spriteProp != null)
+                if (attachment != null)
                 {
-                    spriteProp.objectReferenceValue = sprite;
-                    so.ApplyModifiedProperties();
+                    SerializedObject so = new(attachment);
 
-                    EditorUtility.SetDirty(prefab);
+                    var spriteProp = so.FindProperty("_uiSprite");
+                    if (spriteProp != null)
+                        spriteProp.objectReferenceValue = sprite;
+
+                    var idProp = so.FindProperty("_id");
+                    if (idProp != null)
+                        idProp.intValue = i;
                 }
 
-                SerializedProperty idProp = so.FindProperty("_id");
-
-                if (idProp != null)
-                {
-                    idProp.intValue = i;
-                }
-
-                so.ApplyModifiedProperties();
-                EditorUtility.SetDirty(prefab);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, path);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
             }
         }
     }

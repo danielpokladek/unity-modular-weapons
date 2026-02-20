@@ -1867,6 +1867,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuController
   _canvasGroup: {fileID: 703729646}
+  _autoZoomToggle: {fileID: 842847487}
 --- !u!1 &744788208
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,6 +2375,17 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &842847487 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 326332120870699634, guid: c2601d2d63ac4c791b56e4204ef6d61a, type: 3}
+  m_PrefabInstance: {fileID: 9067397492276725450}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Toggle
 --- !u!1001 &907386591
 PrefabInstance:
   m_ObjectHideFlags: 0
