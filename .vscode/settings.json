@@ -73,6 +73,7 @@
         "interactable",
         "Mathf",
         "Prefs",
+        "Scriptable",
         "Synty"
     ]
 }

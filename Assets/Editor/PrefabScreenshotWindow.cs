@@ -14,9 +14,11 @@ public class PrefabScreenshotWindow : EditorWindow
     private const string ROTATION_Z_KEY = "PrefabScreenshots_RotationZ";
     private const string ORTHOGRAPHIC_KEY = "PrefabScreenshots_Orthographic";
     private const string AUTO_ASSIGN_KEY = "PrefabScreenshots_AutoAssign";
+    private const string POST_PROCESSOR_KEY = "PrefabScreenshots_PostProcessor";
 
     private DefaultAsset? _prefabFolderAsset;
     private DefaultAsset? _outputFolderAsset;
+    private UISpritePostProcessor? _postProcessor;
 
     private int _resolution = 512;
 
@@ -37,6 +39,7 @@ public class PrefabScreenshotWindow : EditorWindow
     {
         string prefabPath = EditorPrefs.GetString(PREFAB_FOLDER_KEY, "");
         string outputPath = EditorPrefs.GetString(OUTPUT_FOLDER_KEY, "");
+        string postProcessorPath = EditorPrefs.GetString(POST_PROCESSOR_KEY, "");
 
         _prefabFolderAsset = string.IsNullOrEmpty(prefabPath)
             ? null
@@ -45,6 +48,10 @@ public class PrefabScreenshotWindow : EditorWindow
         _outputFolderAsset = string.IsNullOrEmpty(outputPath)
             ? null
             : AssetDatabase.LoadAssetAtPath<DefaultAsset>(outputPath);
+
+        _postProcessor = string.IsNullOrEmpty(postProcessorPath)
+            ? null
+            : AssetDatabase.LoadAssetAtPath<UISpritePostProcessor>(postProcessorPath);
 
         _resolution = EditorPrefs.GetInt(RESOLUTION_KEY, 512);
         _padding = EditorPrefs.GetFloat(PADDING_KEY, 1.15f);
@@ -91,6 +98,14 @@ public class PrefabScreenshotWindow : EditorWindow
         _isOrthographic = EditorGUILayout.Toggle("Is Orthographic", _isOrthographic);
         _autoAssign = EditorGUILayout.Toggle("Auto Assign Sprites", _autoAssign);
 
+        _postProcessor = (UISpritePostProcessor?)
+            EditorGUILayout.ObjectField(
+                "Post Processor",
+                _postProcessor,
+                typeof(UISpritePostProcessor),
+                false
+            );
+
         GUILayout.Space(20);
 
         if (GUILayout.Button("Generate Screenshots", GUILayout.Height(40)))
@@ -112,7 +127,9 @@ public class PrefabScreenshotWindow : EditorWindow
                 AutoAssignSprites = _autoAssign,
             };
 
-            PrefabScreenshotTool.Generate(settings);
+            var results = PrefabScreenshotTool.Generate(settings);
+
+            _postProcessor?.OnGenerationComplete(results);
         }
 
         if (EditorGUI.EndChangeCheck())
@@ -142,5 +159,10 @@ public class PrefabScreenshotWindow : EditorWindow
 
         EditorPrefs.SetBool(ORTHOGRAPHIC_KEY, _isOrthographic);
         EditorPrefs.SetBool(AUTO_ASSIGN_KEY, _autoAssign);
+
+        EditorPrefs.SetString(
+            POST_PROCESSOR_KEY,
+            _postProcessor != null ? AssetDatabase.GetAssetPath(_postProcessor) : ""
+        );
     }
 }

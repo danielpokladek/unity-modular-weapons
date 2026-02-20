@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -17,12 +18,19 @@ public struct PrefabScreenshotSettings
     public bool AutoAssignSprites;
 }
 
+public struct GeneratedSpriteInfo
+{
+    public string GUID;
+    public string PrefabPath;
+    public string SpritePath;
+}
+
 public static class PrefabScreenshotTool
 {
     private static string _debugPrefix = "Icon Generation Tool";
     private static int _warningCount = 0;
 
-    public static void Generate(PrefabScreenshotSettings settings)
+    public static List<GeneratedSpriteInfo>? Generate(PrefabScreenshotSettings settings)
     {
         Selection.activeObject = null;
         ActiveEditorTracker.sharedTracker.isLocked = true;
@@ -32,7 +40,7 @@ public static class PrefabScreenshotTool
         if (!Directory.Exists(settings.PrefabFolder))
         {
             Debug.LogError($"{_debugPrefix}: Invalid prefab folder: {settings.PrefabFolder}!");
-            return;
+            return null;
         }
 
         if (!Directory.Exists(settings.OutputFolder))
@@ -78,17 +86,21 @@ public static class PrefabScreenshotTool
         camera.nearClipPlane = 0.01f;
         camera.farClipPlane = 100f;
 
+        var results = new List<GeneratedSpriteInfo>();
+
         try
         {
             for (int i = 0; i < totalFiles; i++)
             {
+                var guid = guids[i];
+
                 EditorUtility.DisplayProgressBar(
                     _debugPrefix,
                     $"Generating Texture {i + 1}/{totalFiles}",
                     (float)i / totalFiles
                 );
 
-                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                string path = AssetDatabase.GUIDToAssetPath(guid);
 
                 if (string.IsNullOrEmpty(path))
                     continue;
@@ -135,6 +147,15 @@ public static class PrefabScreenshotTool
                 );
 
                 Object.DestroyImmediate(go);
+
+                results.Add(
+                    new GeneratedSpriteInfo
+                    {
+                        GUID = guid,
+                        PrefabPath = path,
+                        SpritePath = relativeSpritePath,
+                    }
+                );
             }
         }
         finally
@@ -190,10 +211,10 @@ public static class PrefabScreenshotTool
 
         AssetDatabase.Refresh();
 
-        if (settings.AutoAssignSprites)
-        {
-            AssignDataToPrefab(guids, settings.PrefabFolder, settings.OutputFolder);
-        }
+        // if (settings.AutoAssignSprites)
+        // {
+        //     AssignDataToPrefab(guids, settings.PrefabFolder, settings.OutputFolder);
+        // }
 
         EditorUtility.ClearProgressBar();
 
@@ -206,6 +227,8 @@ public static class PrefabScreenshotTool
         ActiveEditorTracker.sharedTracker.isLocked = false;
 
         Debug.Log($"{_debugPrefix}: Complete. Generated sprites with {_warningCount} warnings.");
+
+        return results;
     }
 
     private static void TakeScreenshot(
