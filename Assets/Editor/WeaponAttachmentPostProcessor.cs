@@ -52,10 +52,11 @@ public class WeaponAttachmentPostProcessor : IconForgePostProcessor
                     var idProp = so.FindProperty("_id");
                     if (idProp != null)
                         idProp.intValue = spriteCounter++;
+
+                    so.ApplyModifiedProperties();
                 }
 
-                bool successful;
-                PrefabUtility.SaveAsPrefabAsset(prefabRoot, path, out successful);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, path, out bool successful);
 
                 if (!successful)
                 {
