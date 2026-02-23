@@ -2,6 +2,7 @@
 
 using PrimeTween;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
@@ -74,7 +75,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (_isPanning && _isRotating)
+        if (EventSystem.current.IsPointerOverGameObject())
             return;
 
         bool hasMovedMouse = _mouseDelta.sqrMagnitude > 0.1f;
