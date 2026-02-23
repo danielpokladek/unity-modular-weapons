@@ -2407,8 +2407,9 @@ GameObject:
   - component: {fileID: 748792737}
   - component: {fileID: 748792739}
   - component: {fileID: 748792740}
+  - component: {fileID: 748792741}
   m_Layer: 5
-  m_Name: Attachments Scroll View
+  m_Name: Attachment Picker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2531,6 +2532,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &748792741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748792735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 957ccc6b4a0db19fb9c09c77bb8e352c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttachmentPickerPanel
+  _itemPrefab: {fileID: -8259502543399200045, guid: 315346f0a9fcef736bbb70a5959e8840, type: 3}
+  _panelHeading: {fileID: 120087805}
+  _container: {fileID: 1273891247}
 --- !u!1 &788278358
 GameObject:
   m_ObjectHideFlags: 0
@@ -5730,15 +5746,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75f364407f25b0891938ded97f5726c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIController
-  _itemPrefab: {fileID: -8259502543399200045, guid: 315346f0a9fcef736bbb70a5959e8840, type: 3}
-  _itemsPanel: {fileID: 748792736}
-  _itemsPanelHeading: {fileID: 120087805}
-  _itemsContainer: {fileID: 1273891247}
   _pointsContainer: {fileID: 1054661854}
-  _removeAttachmentIcon: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
-  _statsPanel: {fileID: 185795887}
   _menuPanel: {fileID: 703729647}
   _weaponPanel: {fileID: 524589899}
+  _statsPanel: {fileID: 185795887}
+  _attachmentPicker: {fileID: 748792741}
   _pointsCanvasGroup: {fileID: 1054661855}
 --- !u!1 &2124195343
 GameObject:

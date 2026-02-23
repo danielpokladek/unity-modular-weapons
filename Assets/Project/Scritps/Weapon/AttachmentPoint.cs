@@ -39,7 +39,7 @@ public class AttachmentPoint : MonoBehaviour
     {
         RemoveCurrentAttachment();
         Events.OnUpdateUI.RemoveListener(Refresh);
-        Manager.Instance.UIController.UnregisterAttachmentFromUI(this);
+        Manager.Instance.UIController.DetachAttachmentFromUI(this);
     }
 
     public void RemoveCurrentAttachment(bool notify = true)
@@ -61,7 +61,7 @@ public class AttachmentPoint : MonoBehaviour
     public void Remove()
     {
         RemoveCurrentAttachment(false);
-        Manager.Instance.UIController.UnregisterAttachmentFromUI(this);
+        Manager.Instance.UIController.DetachAttachmentFromUI(this);
     }
 
     public void SetAttachment(int id)
@@ -104,11 +104,11 @@ public class AttachmentPoint : MonoBehaviour
 
         if (isIncompatibleWithPoint.Count() > 0 || isIncompatibleWithAttachment.Count() > 0)
         {
-            Manager.Instance.UIController.UnregisterAttachmentFromUI(this);
+            Manager.Instance.UIController.DetachAttachmentFromUI(this);
         }
         else
         {
-            Manager.Instance.UIController.RegisterAttachmentToUI(this);
+            Manager.Instance.UIController.LinkAttachmentToUI(this);
         }
     }
 }

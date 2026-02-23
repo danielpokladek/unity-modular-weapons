@@ -8,32 +8,20 @@ using UnityEngine;
 public class UIController : MonoBehaviour
 {
     [SerializeField]
-    ItemUI _itemPrefab;
-
-    [SerializeField]
-    RectTransform _itemsPanel;
-
-    [SerializeField]
-    TMPro.TMP_Text _itemsPanelHeading;
-
-    [SerializeField]
-    RectTransform _itemsContainer;
-
-    [SerializeField]
     RectTransform _pointsContainer;
 
-    [SerializeField]
-    Sprite _removeAttachmentIcon;
-
     [Header("References")]
-    [SerializeField]
-    StatsPanelController _statsPanel;
-
     [SerializeField]
     MenuController _menuPanel;
 
     [SerializeField]
     WeaponPanel _weaponPanel;
+
+    [SerializeField]
+    StatsPanelController _statsPanel;
+
+    [SerializeField]
+    AttachmentPickerPanel _attachmentPicker;
 
     [SerializeField]
     CanvasGroup _pointsCanvasGroup;
@@ -42,43 +30,7 @@ public class UIController : MonoBehaviour
 
     private Queue<AttachmentPointUI> _attachmentPointPool = new();
 
-    private List<ItemUI> _currentItems = new();
-    private List<ItemUI> _inactiveItems = new();
-
-    private bool _isPanelShown;
-
     private Tween? _uiTween;
-
-    public void Initialize()
-    {
-        Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
-        Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
-        Events.OnAttachmentChanged.AddListener(RefreshButtonList);
-
-        Events.OnUpdateUI.AddListener(() =>
-        {
-            if (Manager.Instance.CurrentWeapon == null)
-                return;
-
-            _statsPanel.UpdateStats(Manager.Instance.CurrentWeapon.Stats);
-        });
-
-        Events.OnBodyChanged.AddListener(() =>
-        {
-            _weaponPanel.Hide();
-            HideAttachmentPicker();
-        });
-
-        Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
-
-        _menuPanel.Initialize();
-        _menuPanel.ToggleVisibility(true);
-
-        _weaponPanel.Initialize();
-        _weaponPanel.ToggleVisibility();
-
-        HideAttachmentPicker();
-    }
 
     private void Update()
     {
@@ -90,18 +42,48 @@ public class UIController : MonoBehaviour
             var screenPos = Camera.main.WorldToScreenPoint(point.Key.transform.position);
             point.Value.transform.position = screenPos;
 
-            if (_isPanelShown && point.Key == Manager.Instance.CurrentAttachmentPoint)
+            if (_attachmentPicker.IsVisible && point.Key == Manager.Instance.CurrentAttachmentPoint)
             {
                 var pointHeight = (point.Value.transform as RectTransform)?.sizeDelta.y ?? 30;
                 var panelPos = screenPos;
                 panelPos.y -= pointHeight * 0.85f;
 
-                _itemsPanel.transform.position = panelPos;
+                _attachmentPicker.transform.position = panelPos;
             }
         }
     }
 
     public StatsPanelController StatsPanel => _statsPanel;
+
+    public void Initialize()
+    {
+        Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
+        Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
+        Events.OnAttachmentChanged.AddListener(_attachmentPicker.RefreshButtonList);
+        Events.OnBodyChanged.AddListener(() =>
+        {
+            _weaponPanel.Hide();
+            _attachmentPicker.Hide();
+        });
+
+        Events.OnUpdateUI.AddListener(() =>
+        {
+            if (Manager.Instance.CurrentWeapon == null)
+                return;
+
+            _statsPanel.UpdateStats(Manager.Instance.CurrentWeapon.Stats);
+        });
+
+        Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
+
+        _menuPanel.Initialize();
+        _menuPanel.ToggleVisibility(true);
+
+        _weaponPanel.Initialize();
+        _weaponPanel.ToggleVisibility();
+
+        _attachmentPicker.Hide();
+    }
 
     public void HandleExplodeButtonPressed()
     {
@@ -123,7 +105,7 @@ public class UIController : MonoBehaviour
         _weaponPanel.ToggleVisibility();
     }
 
-    public void RegisterAttachmentToUI(AttachmentPoint point)
+    public void LinkAttachmentToUI(AttachmentPoint point)
     {
         if (_attachmentDictionary.ContainsKey(point))
             return;
@@ -144,7 +126,7 @@ public class UIController : MonoBehaviour
         newPoint.transform.SetParent(_pointsContainer);
     }
 
-    public void UnregisterAttachmentFromUI(AttachmentPoint point)
+    public void DetachAttachmentFromUI(AttachmentPoint point)
     {
         if (point == null)
             return;
@@ -152,10 +134,7 @@ public class UIController : MonoBehaviour
         if (!_attachmentDictionary.ContainsKey(point))
             return;
 
-        // TODO: Pool those.
-        AttachmentPointUI? pointUI = _attachmentDictionary[point];
-
-        if (pointUI != null)
+        if (_attachmentDictionary.TryGetValue(point, out AttachmentPointUI pointUI))
         {
             pointUI.transform.SetParent(null);
             _attachmentPointPool.Enqueue(pointUI);
@@ -164,108 +143,16 @@ public class UIController : MonoBehaviour
         _attachmentDictionary.Remove(point);
     }
 
-    public void UnselectAttachment()
-    {
-        Events.OnAttachmentPointUnfocus.Invoke();
-    }
-
     private void HandleAttachmentSelected(AttachmentPoint point)
     {
-        ClearExistingItems();
-        RefreshButtonList();
-
-        ShowPanel(point.Name);
+        _attachmentPicker.Clear();
+        _attachmentPicker.RefreshButtonList();
+        _attachmentPicker.Show(string.IsNullOrEmpty(point.Name) ? " " : point.Name);
     }
 
     private async Task HandleAttachmentUnselected()
     {
-        HideAttachmentPicker();
-
-        ClearExistingItems();
-    }
-
-    private void RefreshButtonList()
-    {
-        ClearExistingItems();
-
-        AttachmentPoint? point = Manager.Instance.CurrentAttachmentPoint;
-
-        if (point == null)
-            return;
-
-        var removeButton = GetAttachmentButton();
-        removeButton.Initialize(_removeAttachmentIcon, "NONE", true);
-        removeButton.Button.onClick.AddListener(() =>
-        {
-            point.RemoveCurrentAttachment();
-        });
-        removeButton.Button.interactable = point.CurrentAttachment != null;
-        removeButton.transform.SetParent(_itemsContainer);
-        removeButton.transform.localScale = Vector3.one;
-
-        _currentItems.Add(removeButton);
-
-        foreach (var attachment in point.AvailableAttachments)
-        {
-            var attachmentButton = GetAttachmentButton();
-            attachmentButton.Initialize(attachment.UISprite, attachment.Name);
-
-            attachmentButton.Button.onClick.AddListener(() =>
-            {
-                point.RemoveCurrentAttachment();
-                point.SetAttachment(attachment.ID);
-            });
-
-            if (point.CurrentAttachment?.ID == attachment.ID)
-            {
-                attachmentButton.Button.interactable = false;
-            }
-
-            attachmentButton.transform.SetParent(_itemsContainer);
-            attachmentButton.transform.localScale = Vector3.one;
-
-            _currentItems.Add(attachmentButton);
-        }
-    }
-
-    public void ShowPanel(string attachmentName)
-    {
-        if (_isPanelShown != true)
-        {
-            _isPanelShown = true;
-            _itemsPanel.gameObject.SetActive(true);
-        }
-
-        _itemsPanelHeading.text = attachmentName;
-    }
-
-    private void HideAttachmentPicker()
-    {
-        _isPanelShown = false;
-        _itemsPanel.gameObject.SetActive(false);
-    }
-
-    private void ClearExistingItems()
-    {
-        while (_currentItems.Count > 0)
-        {
-            var item = _currentItems[0];
-            _currentItems.Remove(item);
-
-            item.Reset();
-            _inactiveItems.Add(item);
-        }
-    }
-
-    private ItemUI GetAttachmentButton()
-    {
-        if (_inactiveItems.Count == 0)
-            return Instantiate(_itemPrefab, Vector2.zero, Quaternion.identity);
-
-        var item = _inactiveItems[0];
-        _inactiveItems.Remove(item);
-
-        return item;
+        _attachmentPicker.Hide();
     }
 
     private void ToggleUI()
