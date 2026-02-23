@@ -56,6 +56,9 @@ public class WeaponPanel : MonoBehaviour
 
     public void Show()
     {
+        if (_canvasGroup.alpha == 1)
+            return;
+
         _currentTween?.Stop();
 
         var from = _canvasGroup.alpha;
@@ -68,6 +71,9 @@ public class WeaponPanel : MonoBehaviour
 
     public void Hide()
     {
+        if (_canvasGroup.alpha == 0)
+            return;
+
         _currentTween?.Stop();
 
         var from = _canvasGroup.alpha;
