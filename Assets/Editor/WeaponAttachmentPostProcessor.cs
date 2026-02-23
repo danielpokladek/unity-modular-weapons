@@ -4,11 +4,11 @@ using UnityEngine;
 
 [CreateAssetMenu(
     fileName = "WeaponAttachmentPostProcessor",
-    menuName = "UI Sprite Generator/Weapon Attachment Post Processor"
+    menuName = "Icon Forge/Weapon Attachment Post Processor"
 )]
-public class WeaponAttachmentPostProcessor : UISpritePostProcessor
+public class WeaponAttachmentPostProcessor : IconForgePostProcessor
 {
-    public override void OnGenerationComplete(List<GeneratedSpriteInfo> results)
+    public override void OnGenerationComplete(List<GeneratedSpriteData> results)
     {
         Debug.Log("Running post processor script..");
 
@@ -18,7 +18,7 @@ public class WeaponAttachmentPostProcessor : UISpritePostProcessor
         foreach (var result in results)
         {
             EditorUtility.DisplayProgressBar(
-                "UI Screenshot Tool",
+                "Icon Forge Post Process",
                 $"Assigning Sprites {spriteCounter + 1}/{length}",
                 (float)spriteCounter / length
             );
@@ -34,7 +34,7 @@ public class WeaponAttachmentPostProcessor : UISpritePostProcessor
             if (prefabRoot == null || sprite == null)
             {
                 Debug.LogWarning(
-                    $"[UI SCREENSHOT]: Could not link {path}. Sprite found: {sprite != null}. Sprite Path: {result.SpritePath}"
+                    $"Could not link {path}. Sprite found: {sprite != null}. Sprite Path: {result.SpritePath}"
                 );
                 continue;
             }
