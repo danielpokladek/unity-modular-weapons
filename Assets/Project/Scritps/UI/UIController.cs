@@ -38,7 +38,9 @@ public class UIController : MonoBehaviour
     [SerializeField]
     CanvasGroup _pointsCanvasGroup;
 
-    private Dictionary<AttachmentPoint, Transform> _attachmentDictionary = new();
+    private Dictionary<AttachmentPoint, AttachmentPointUI> _attachmentDictionary = new();
+
+    private Queue<AttachmentPointUI> _attachmentPointPool = new();
 
     private List<ItemUI> _currentItems = new();
     private List<ItemUI> _inactiveItems = new();
@@ -64,6 +66,7 @@ public class UIController : MonoBehaviour
         Events.OnBodyChanged.AddListener(() =>
         {
             _weaponPanel.Hide();
+            HideAttachmentPicker();
         });
 
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
@@ -74,7 +77,7 @@ public class UIController : MonoBehaviour
         _weaponPanel.Initialize();
         _weaponPanel.ToggleVisibility();
 
-        HidePanel(true);
+        HideAttachmentPicker();
     }
 
     private void Update()
@@ -128,15 +131,16 @@ public class UIController : MonoBehaviour
         var worldPos = point.transform.position;
         var screenPos = Camera.main.WorldToScreenPoint(worldPos);
 
-        var newPoint = Instantiate(
-            Manager.Instance.AttachmentPointUIPrefab,
-            screenPos,
-            Quaternion.identity,
-            Manager.Instance.Canvas.transform
-        );
+        var newPoint =
+            _attachmentPointPool.Count > 0
+                ? _attachmentPointPool.Dequeue()
+                : Instantiate(Manager.Instance.AttachmentPointUIPrefab);
+
+        newPoint.transform.SetPositionAndRotation(screenPos, Quaternion.identity);
+        newPoint.transform.SetParent(Manager.Instance.Canvas.transform);
         newPoint.Initialize(point);
 
-        _attachmentDictionary.Add(point, newPoint.transform);
+        _attachmentDictionary.Add(point, newPoint);
         newPoint.transform.SetParent(_pointsContainer);
     }
 
@@ -149,11 +153,12 @@ public class UIController : MonoBehaviour
             return;
 
         // TODO: Pool those.
-        Transform? uiPoint = _attachmentDictionary[point];
+        AttachmentPointUI? pointUI = _attachmentDictionary[point];
 
-        if (uiPoint != null)
+        if (pointUI != null)
         {
-            uiPoint.SetParent(null);
+            pointUI.transform.SetParent(null);
+            _attachmentPointPool.Enqueue(pointUI);
         }
 
         _attachmentDictionary.Remove(point);
@@ -174,7 +179,7 @@ public class UIController : MonoBehaviour
 
     private async Task HandleAttachmentUnselected()
     {
-        HidePanel();
+        HideAttachmentPicker();
 
         ClearExistingItems();
     }
@@ -234,7 +239,7 @@ public class UIController : MonoBehaviour
         _itemsPanelHeading.text = attachmentName;
     }
 
-    private void HidePanel(bool isInstant = false)
+    private void HideAttachmentPicker()
     {
         _isPanelShown = false;
         _itemsPanel.gameObject.SetActive(false);
