@@ -61,6 +61,11 @@ public class UIController : MonoBehaviour
             _statsPanel.UpdateStats(Manager.Instance.CurrentWeapon.Stats);
         });
 
+        Events.OnBodyChanged.AddListener(() =>
+        {
+            _weaponPanel.Hide();
+        });
+
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         _menuPanel.Initialize();

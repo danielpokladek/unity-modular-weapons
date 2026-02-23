@@ -48,19 +48,32 @@ public class WeaponPanel : MonoBehaviour
     {
         _currentTween?.Stop();
 
-        var isVisible = _canvasGroup.alpha > 0;
-        var from = _canvasGroup.alpha;
-        var to = isVisible ? 0 : 1;
+        if (_canvasGroup.alpha > 0)
+            Hide();
+        else
+            Show();
+    }
 
-        if (!isVisible)
+    public void Show()
+    {
+        _currentTween?.Stop();
+
+        var from = _canvasGroup.alpha;
+
+        if (_canvasGroup.alpha == 0)
             gameObject.SetActive(true);
 
+        _currentTween = Tween.Custom(from, 1, 0.25f, (val) => _canvasGroup.alpha = val);
+    }
+
+    public void Hide()
+    {
+        _currentTween?.Stop();
+
+        var from = _canvasGroup.alpha;
+
         _currentTween = Tween
-            .Custom(from, to, 0.25f, (val) => _canvasGroup.alpha = val)
-            .OnComplete(() =>
-            {
-                if (isVisible)
-                    gameObject.SetActive(false);
-            });
+            .Custom(from, 0, 0.25f, (val) => _canvasGroup.alpha = val)
+            .OnComplete(() => gameObject.SetActive(false));
     }
 }

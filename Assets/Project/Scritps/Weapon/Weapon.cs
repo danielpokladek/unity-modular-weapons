@@ -79,6 +79,7 @@ public class Weapon : MonoBehaviour
         _weaponBody = newBody;
 
         Events.OnAttachmentChanged.Invoke();
+        Events.OnBodyChanged.Invoke();
     }
 
     private void HandleAttachmentChanged()
