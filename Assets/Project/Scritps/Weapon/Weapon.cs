@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using EditorAttributes;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Weapon : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Weapon : MonoBehaviour
     private HashSet<WeaponAttachment> _currentAttachments = new();
 
     private bool _isExploded = false;
+    private bool _isMouseOverUI = false;
 
     private void Start()
     {
@@ -24,6 +26,24 @@ public class Weapon : MonoBehaviour
 
         Events.OnExplodeWeapon.AddListener((_) => _isExploded = true);
         Events.OnCompactWeapon.AddListener((_) => _isExploded = false);
+
+        float inputStartTime = 0;
+
+        Controls.InputActions.Camera.Pan.performed += _ =>
+        {
+            inputStartTime = Time.time;
+        };
+
+        Controls.InputActions.Camera.Pan.canceled += _ =>
+        {
+            var currentTime = Time.time;
+            var timeDiff = currentTime - inputStartTime;
+
+            if (timeDiff < 0.1f && !_isMouseOverUI)
+            {
+                Events.OnAttachmentPointUnfocus.Invoke();
+            }
+        };
     }
 
     private void OnDestroy()
@@ -32,6 +52,14 @@ public class Weapon : MonoBehaviour
 
         Events.OnExplodeWeapon.RemoveAllListeners();
         Events.OnCompactWeapon.RemoveAllListeners();
+    }
+
+    private void Update()
+    {
+        // A little hacky, but stops the warning in console about calling the function
+        //  from within event callback.
+        // TODO: Figure out a better way to check this in "new" InputSystem.
+        _isMouseOverUI = EventSystem.current.IsPointerOverGameObject();
     }
 
     public WeaponStats Stats => _weaponData;
