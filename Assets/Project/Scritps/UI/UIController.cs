@@ -15,9 +15,6 @@ public class UIController : MonoBehaviour
     MenuController _menuPanel;
 
     [SerializeField]
-    WeaponPanel _weaponPanel;
-
-    [SerializeField]
     StatsPanelController _statsPanel;
 
     [SerializeField]
@@ -62,7 +59,7 @@ public class UIController : MonoBehaviour
         Events.OnAttachmentChanged.AddListener(_attachmentPicker.RefreshButtonList);
         Events.OnBodyChanged.AddListener(() =>
         {
-            _weaponPanel.Hide();
+            _menuPanel.Hide();
             _attachmentPicker.Hide();
         });
 
@@ -77,11 +74,8 @@ public class UIController : MonoBehaviour
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         _menuPanel.Initialize();
-        _menuPanel.ToggleVisibility(true);
 
-        _weaponPanel.Initialize();
-        _weaponPanel.ToggleVisibility();
-
+        _statsPanel.ToggleStatsPanel();
         _attachmentPicker.Hide();
     }
 
@@ -98,11 +92,6 @@ public class UIController : MonoBehaviour
         {
             Events.OnCompactWeapon.Invoke(false);
         }
-    }
-
-    public void HandleBodyChangeButtonPressed()
-    {
-        _weaponPanel.ToggleVisibility();
     }
 
     public void LinkAttachmentToUI(AttachmentPoint point)
