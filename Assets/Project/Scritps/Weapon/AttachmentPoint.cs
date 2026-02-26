@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttachmentPoint : MonoBehaviour
@@ -64,15 +65,28 @@ public class AttachmentPoint : MonoBehaviour
         Manager.Instance.UIController.DetachAttachmentFromUI(this);
     }
 
-    public void SetAttachment(int id)
+    public bool SetAttachment(int id)
     {
         var attachment = _availableAttachments.Find((a) => a.ID == id);
 
         if (attachment == null)
         {
             Debug.LogWarning($"Tried to attach something that isn't in available list: {id}");
-            return;
+            return false;
         }
+
+        var currentWeapon = Manager.Instance.CurrentWeapon;
+
+        var attachmentIncompatible = currentWeapon.CurrentAttachments.Any(a =>
+            _incompatibleAttachments.Contains(a)
+        );
+
+        var attachmentPointIncompatible = currentWeapon.CurrentAttachmentPoints.Any(p =>
+            _incompatibleAttachmentPoints.Any(p2 => p == p2 && p2.CurrentAttachment != null)
+        );
+
+        if (attachmentIncompatible || attachmentPointIncompatible)
+            return false;
 
         RemoveCurrentAttachment(false);
 
@@ -82,6 +96,8 @@ public class AttachmentPoint : MonoBehaviour
         CurrentAttachment.transform.localRotation = Quaternion.identity;
 
         Events.OnAttachmentChanged.Invoke();
+
+        return true;
     }
 
     private void Refresh()

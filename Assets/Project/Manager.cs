@@ -1,12 +1,59 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [Serializable]
 public class AppSettings
 {
-    public bool AutoZoomToAttachment;
+    private bool _autoCameraPan = false;
+    private float _panSensitivity = 0.1f;
+    private float _rotationSensitivity = 0.1f;
+    private float _scrollSensitivity = 1f;
+
+    public UnityEvent OnSettingChanged = new();
+
+    public bool AutoCameraPan
+    {
+        get => _autoCameraPan;
+        set
+        {
+            _autoCameraPan = value;
+            OnSettingChanged.Invoke();
+        }
+    }
+
+    public float PanSensitivity
+    {
+        get => _panSensitivity;
+        set
+        {
+            _panSensitivity = value;
+            OnSettingChanged.Invoke();
+        }
+    }
+
+    public float RotationSensitivity
+    {
+        get => _rotationSensitivity;
+        set
+        {
+            _rotationSensitivity = value;
+            OnSettingChanged.Invoke();
+        }
+    }
+
+    public float ZoomSensitivity
+    {
+        get => _scrollSensitivity;
+        set
+        {
+            _scrollSensitivity = value;
+            OnSettingChanged.Invoke();
+        }
+    }
 }
 
 public class Manager : MonoBehaviour
@@ -27,13 +74,17 @@ public class Manager : MonoBehaviour
     [SerializeField]
     Weapon _currentWeapon = null!;
 
+    [SerializeField]
+    List<WeaponPreset> _weaponPresets = new();
+
     private AttachmentPoint? _currentAttachmentPoint;
 
     private void Awake()
     {
-        Settings = LoadSettings();
-
         Instance = this;
+
+        Settings = LoadSettings();
+        Settings.OnSettingChanged.AddListener(SaveSettings);
 
         Events.OnAttachmentPointFocus.AddListener((point) => _currentAttachmentPoint = point);
         Events.OnAttachmentPointUnfocus.AddListener(() => _currentAttachmentPoint = null);
@@ -55,19 +106,43 @@ public class Manager : MonoBehaviour
     public AttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;
 
     public Weapon CurrentWeapon => _currentWeapon;
+    public List<WeaponPreset> WeaponPresets => _weaponPresets;
+
+    [ContextMenu("Load Random Preset")]
+    public void LoadRandomPreset()
+    {
+        var index = UnityEngine.Random.Range(0, _weaponPresets.Count);
+        LoadPreset(index);
+    }
+
+    public void LoadPreset(int index)
+    {
+        if (index < 0 || index > _weaponPresets.Count - 1)
+        {
+            Debug.Log(
+                $"Tried to load weapon preset from index list, but index {index} is invalid!"
+            );
+            return;
+        }
+        _currentWeapon.LoadPreset(_weaponPresets[index]);
+    }
 
     public AppSettings LoadSettings()
     {
-        var settings = new AppSettings
+        return new AppSettings
         {
-            AutoZoomToAttachment = PlayerPrefs.GetInt("AutoZoomToAttachment", 1) != 0,
+            AutoCameraPan = PlayerPrefs.GetInt("AutoCameraPan", 1) != 0,
+            PanSensitivity = PlayerPrefs.GetFloat("PanSensitivity", 0.1f),
+            RotationSensitivity = PlayerPrefs.GetFloat("RotationSensitivity", 0.1f),
         };
-
-        return settings;
     }
 
     public void SaveSettings()
     {
-        PlayerPrefs.SetInt("AutoZoomToAttachment", Settings.AutoZoomToAttachment ? 1 : 0);
+        PlayerPrefs.SetInt("AutoCameraPan", Settings.AutoCameraPan ? 1 : 0);
+        PlayerPrefs.SetFloat("PanSensitivity", Settings.PanSensitivity);
+        PlayerPrefs.SetFloat("RotationSensitivity", Settings.RotationSensitivity);
+
+        print(Settings.RotationSensitivity);
     }
 }

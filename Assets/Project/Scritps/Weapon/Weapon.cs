@@ -1,9 +1,11 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class Weapon : MonoBehaviour
 {
@@ -44,6 +46,12 @@ public class Weapon : MonoBehaviour
                 Events.OnAttachmentPointUnfocus.Invoke();
             }
         };
+
+        Controls.InputActions.Camera.ResetCamera.performed += _ =>
+        {
+            _weaponBody.RemoveAttachments();
+            _weaponBody.SetRandomAttachments();
+        };
     }
 
     private void OnDestroy()
@@ -68,9 +76,22 @@ public class Weapon : MonoBehaviour
 
     public bool IsExploded => _isExploded;
 
+    public void LoadPreset(WeaponPreset preset)
+    {
+        ChangeBody(preset.Body);
+
+        _weaponBody.LoadAttachments(preset.AttachmentIDList);
+    }
+
+    [ContextMenu("Print Current Attachment IDs")]
+    public void PrintCurrentAttachmentIDs()
+    {
+        Debug.Log(string.Join(", ", _currentAttachments.Select(a => a.ID)));
+    }
+
     public void ChangeBody(WeaponAttachment body)
     {
-        _weaponBody.RemoveAttachment();
+        _weaponBody?.RemoveAttachment();
 
         var newBody = Instantiate(body, transform);
         newBody.transform.localPosition = Vector3.zero;
@@ -84,6 +105,9 @@ public class Weapon : MonoBehaviour
 
     private void HandleAttachmentChanged()
     {
+        if (_weaponBody == null)
+            return;
+
         if (_isExploded)
         {
             Events.OnCompactWeapon.Invoke(true);

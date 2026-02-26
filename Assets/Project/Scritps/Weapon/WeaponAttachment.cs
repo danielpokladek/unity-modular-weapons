@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using PrimeTween;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -71,6 +72,29 @@ public class WeaponAttachment : MonoBehaviour
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
     }
 
+    public void LoadAttachments(List<int> preset)
+    {
+        foreach (var point in _attachmentPoints)
+        {
+            int i = 0;
+
+            foreach (var attachment in point.AvailableAttachments)
+            {
+                if (preset.Contains(attachment.ID))
+                {
+                    point.SetAttachment(attachment.ID);
+                }
+
+                i++;
+            }
+
+            if (point.CurrentAttachment != null)
+            {
+                point.CurrentAttachment.LoadAttachments(preset);
+            }
+        }
+    }
+
     public HashSet<WeaponAttachment> FetchEquippedAttachments()
     {
         HashSet<WeaponAttachment> attachments = new();
@@ -109,15 +133,40 @@ public class WeaponAttachment : MonoBehaviour
 
     public void RemoveAttachment()
     {
-        foreach (var point in _attachmentPoints)
-        {
-            point.Remove();
-        }
+        RemoveAttachments();
 
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
 
         Destroy(gameObject);
+    }
+
+    public void RemoveAttachments()
+    {
+        foreach (var point in _attachmentPoints)
+        {
+            point.RemoveCurrentAttachment();
+        }
+    }
+
+    public void SetRandomAttachments()
+    {
+        foreach (var point in _attachmentPoints)
+        {
+            int attempt = 0;
+            int maxAttempts = _attachmentPoints.Count;
+
+            while (point.CurrentAttachment == null && attempt < maxAttempts)
+            {
+                var randomAttachmentIndex = Random.Range(0, point.AvailableAttachments.Count);
+                var randomAttachment = point.AvailableAttachments[randomAttachmentIndex];
+
+                point.SetAttachment(randomAttachment.ID);
+                point.CurrentAttachment?.SetRandomAttachments();
+
+                attempt++;
+            }
+        }
     }
 
     private void OnDrawGizmos()
