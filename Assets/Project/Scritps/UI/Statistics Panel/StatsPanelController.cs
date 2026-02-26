@@ -44,7 +44,7 @@ public class StatsPanelController : MonoBehaviour
         _activeTween = Tween.Custom(from, to, 0.25f, (val) => _canvasGroup.alpha = val);
     }
 
-    public void UpdateStats(WeaponStats stats)
+    public void UpdateStats(WeaponData stats)
     {
         _weight.SetValueText(stats.Weight);
         _ergonomics.SetValueText(stats.Ergonomics);

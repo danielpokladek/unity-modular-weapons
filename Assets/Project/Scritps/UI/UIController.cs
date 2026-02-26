@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour
     StatsPanelController _statsPanel;
 
     [SerializeField]
-    AttachmentPickerPanel _attachmentPicker;
+    AttachmentPickerController _attachmentPicker;
 
     [SerializeField]
     CanvasGroup _pointsCanvasGroup;
@@ -38,15 +38,6 @@ public class UIController : MonoBehaviour
 
             var screenPos = Camera.main.WorldToScreenPoint(point.Key.transform.position);
             point.Value.transform.position = screenPos;
-
-            if (_attachmentPicker.IsVisible && point.Key == Manager.Instance.CurrentAttachmentPoint)
-            {
-                var pointHeight = (point.Value.transform as RectTransform)?.sizeDelta.y ?? 30;
-                var panelPos = screenPos;
-                panelPos.y -= pointHeight * 0.85f;
-
-                _attachmentPicker.transform.position = panelPos;
-            }
         }
     }
 
@@ -56,7 +47,7 @@ public class UIController : MonoBehaviour
     {
         Events.OnAttachmentPointFocus.AddListener(HandleAttachmentSelected);
         Events.OnAttachmentPointUnfocus.AddListener(() => _ = HandleAttachmentUnselected());
-        Events.OnAttachmentChanged.AddListener(_attachmentPicker.RefreshButtonList);
+        Events.OnAttachmentChanged.AddListener(() => _attachmentPicker.Refresh());
         Events.OnBodyChanged.AddListener(() =>
         {
             _menuPanel.Hide();
@@ -74,9 +65,10 @@ public class UIController : MonoBehaviour
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         _menuPanel.Initialize();
+        _attachmentPicker.Initialize();
 
         _statsPanel.ToggleStatsPanel();
-        _attachmentPicker.Hide();
+        _attachmentPicker.Hide(true);
     }
 
     public void HandleExplodeButtonPressed()
@@ -134,9 +126,8 @@ public class UIController : MonoBehaviour
 
     private void HandleAttachmentSelected(AttachmentPoint point)
     {
-        _attachmentPicker.Clear();
-        _attachmentPicker.RefreshButtonList();
-        _attachmentPicker.Show(string.IsNullOrEmpty(point.Name) ? " " : point.Name);
+        var heading = string.IsNullOrEmpty(point.Name) ? " " : point.Name;
+        _attachmentPicker.Show(heading, point);
     }
 
     private async Task HandleAttachmentUnselected()

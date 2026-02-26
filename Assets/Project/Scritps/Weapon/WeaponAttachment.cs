@@ -19,7 +19,7 @@ public class WeaponAttachment : MonoBehaviour
     List<AttachmentPoint> _attachmentPoints = new();
 
     [SerializeField]
-    WeaponStats _statsModifiers;
+    WeaponData _statsModifiers;
 
     [Header("Auto Assigned")]
     [SerializeField]
@@ -35,7 +35,7 @@ public class WeaponAttachment : MonoBehaviour
 
     public List<AttachmentPoint> AttachmentPoints => _attachmentPoints;
 
-    public WeaponStats StatsModifiers => _statsModifiers;
+    public WeaponData StatsModifiers => _statsModifiers;
 
     public Sprite UISprite => _uiSprite;
 

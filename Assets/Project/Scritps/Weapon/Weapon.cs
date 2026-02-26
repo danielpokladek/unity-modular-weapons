@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 public class Weapon : MonoBehaviour
 {
     [SerializeField, ReadOnly]
-    WeaponStats _weaponData = null!;
+    WeaponData _weaponData = null!;
 
     [SerializeField]
     WeaponAttachment _weaponBody = null!;
@@ -70,7 +70,7 @@ public class Weapon : MonoBehaviour
         _isMouseOverUI = EventSystem.current.IsPointerOverGameObject();
     }
 
-    public WeaponStats Stats => _weaponData;
+    public WeaponData Stats => _weaponData;
     public HashSet<AttachmentPoint> CurrentAttachmentPoints => _currentAttachmentPoints;
     public HashSet<WeaponAttachment> CurrentAttachments => _currentAttachments;
 
@@ -127,7 +127,7 @@ public class Weapon : MonoBehaviour
         Events.OnUpdateUI.Invoke();
     }
 
-    private void AddStatsModifiers(WeaponStats stats)
+    private void AddStatsModifiers(WeaponData stats)
     {
         _weaponData.Weight += stats.Weight;
         _weaponData.Ergonomics += stats.Ergonomics;

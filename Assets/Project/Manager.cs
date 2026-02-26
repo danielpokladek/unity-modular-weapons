@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using PrimeTween;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -83,6 +84,8 @@ public class Manager : MonoBehaviour
     {
         Instance = this;
 
+        PrimeTweenConfig.warnZeroDuration = false;
+
         Settings = LoadSettings();
         Settings.OnSettingChanged.AddListener(SaveSettings);
 
@@ -142,7 +145,5 @@ public class Manager : MonoBehaviour
         PlayerPrefs.SetInt("AutoCameraPan", Settings.AutoCameraPan ? 1 : 0);
         PlayerPrefs.SetFloat("PanSensitivity", Settings.PanSensitivity);
         PlayerPrefs.SetFloat("RotationSensitivity", Settings.RotationSensitivity);
-
-        print(Settings.RotationSensitivity);
     }
 }

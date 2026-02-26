@@ -33,12 +33,29 @@ public class MenuController : MonoBehaviour
 
     private Tween? _currentTween;
 
+    private void OnEnable()
+    {
+        ClearBindings();
+
+        var uiRoot = _uiDocument.rootVisualElement;
+
+        if (uiRoot == null)
+        {
+            Debug.LogError("Could not find the root element of UI!", gameObject);
+            return;
+        }
+
+        SetupBindings(uiRoot);
+    }
+
+    private void OnDisable()
+    {
+        ClearBindings();
+    }
+
     private void OnDestroy()
     {
-        foreach (var action in _cleanupActions)
-            action();
-
-        _cleanupActions.Clear();
+        ClearBindings();
     }
 
     public void Initialize()
@@ -46,13 +63,79 @@ public class MenuController : MonoBehaviour
         _manager = Manager.Instance;
         var uiRoot = _uiDocument.rootVisualElement;
 
-        var settings = _manager.Settings;
-
         if (uiRoot == null)
         {
             Debug.LogError("Could not find the root element of UI!", gameObject);
             return;
         }
+
+        SetupBindings(uiRoot);
+    }
+
+    public void ToggleVisibility(ClickEvent _)
+    {
+        if (_menuPanel == null)
+        {
+            Debug.LogError("Menu button is missing from menu controller!");
+            return;
+        }
+
+        if (_menuPanel.style.opacity.value > 0)
+            Hide();
+        else
+            Show();
+    }
+
+    public void Show(bool isInstant = false)
+    {
+        if (_menuPanel == null || _menuPanel.style.opacity == 1)
+            return;
+
+        _currentTween?.Stop();
+
+        var duration = isInstant ? 0 : 0.25f;
+
+        _menuPanel.style.display = DisplayStyle.Flex;
+
+        _currentTween = Tween.Custom(
+            _menuPanel.style.opacity.value,
+            1f,
+            duration,
+            (val) => _menuPanel.style.opacity = val
+        );
+    }
+
+    public void Hide(bool isInstant = false)
+    {
+        if (_menuPanel == null || _menuPanel.style.opacity == 0)
+            return;
+
+        _currentTween?.Stop();
+
+        var duration = isInstant ? 0 : 0.25f;
+
+        _currentTween = Tween
+            .Custom(
+                _menuPanel.style.opacity.value,
+                0f,
+                duration,
+                (val) => _menuPanel.style.opacity = val
+            )
+            .OnComplete(() =>
+            {
+                _menuPanel.style.display = DisplayStyle.None;
+            });
+    }
+
+    private void SetupBindings(VisualElement uiRoot)
+    {
+        if (_manager == null)
+        {
+            Debug.LogError("Unable to bind UI controls, manager is null!");
+            return;
+        }
+
+        var settings = _manager.Settings;
 
         _menuPanel = uiRoot.Q<VisualElement>("menu-panel");
 
@@ -173,58 +256,11 @@ public class MenuController : MonoBehaviour
         }
     }
 
-    public void ToggleVisibility(ClickEvent _)
+    private void ClearBindings()
     {
-        if (_menuPanel == null)
-        {
-            Debug.LogError("Menu button is missing from menu controller!");
-            return;
-        }
+        foreach (var action in _cleanupActions)
+            action();
 
-        if (_menuPanel.style.opacity.value > 0)
-            Hide();
-        else
-            Show();
-    }
-
-    public void Show(bool isInstant = false)
-    {
-        if (_menuPanel == null || _menuPanel.style.opacity == 1)
-            return;
-
-        _currentTween?.Stop();
-
-        var duration = isInstant ? 0 : 0.25f;
-
-        _menuPanel.style.display = DisplayStyle.Flex;
-
-        _currentTween = Tween.Custom(
-            _menuPanel.style.opacity.value,
-            1f,
-            duration,
-            (val) => _menuPanel.style.opacity = val
-        );
-    }
-
-    public void Hide(bool isInstant = false)
-    {
-        if (_menuPanel == null || _menuPanel.style.opacity == 0)
-            return;
-
-        _currentTween?.Stop();
-
-        var duration = isInstant ? 0 : 0.25f;
-
-        _currentTween = Tween
-            .Custom(
-                _menuPanel.style.opacity.value,
-                0f,
-                duration,
-                (val) => _menuPanel.style.opacity = val
-            )
-            .OnComplete(() =>
-            {
-                _menuPanel.style.display = DisplayStyle.None;
-            });
+        _cleanupActions.Clear();
     }
 }
