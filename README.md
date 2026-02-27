@@ -2,6 +2,8 @@
 
 A simple modular weapon customization demo built in Unity, allowing users to dynamically attach and remove different weapon components such as the weapon body, handguard, stock, and more.
 
+https://github.com/user-attachments/assets/ece35547-c3f5-49c3-9298-79557c13f2e0
+
 ## Overview
 
 This is a lightweight demonstration project showcasing a modular attachment system for weapons. The project is designed to demonstrate how weapon parts can be:
