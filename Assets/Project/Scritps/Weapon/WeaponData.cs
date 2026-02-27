@@ -5,12 +5,12 @@ using System;
 [Serializable]
 public class WeaponData
 {
-    public float Weight;
-    public float Ergonomics;
-    public float Accuracy;
-    public float SightingRange;
-    public float VerticalRecoil;
-    public float HorizontalRecoil;
-    public float FireRate;
-    public float EffectiveDistance;
+    public float Weight = 0;
+    public float Ergonomics = 0;
+    public float Accuracy = 0;
+    public float SightingRange = 0;
+    public float VerticalRecoil = 0;
+    public float HorizontalRecoil = 0;
+    public float FireRate = 0;
+    public float EffectiveDistance = 0;
 }

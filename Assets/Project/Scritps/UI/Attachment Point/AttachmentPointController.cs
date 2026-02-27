@@ -13,6 +13,8 @@ public class AttachmentPointController : MonoBehaviour
 
     private VisualElement? _uiRoot;
 
+    public bool IsPointLinked(AttachmentPoint point) => _shownPoints.ContainsKey(point);
+
     private void Update()
     {
         if (_uiRoot == null)

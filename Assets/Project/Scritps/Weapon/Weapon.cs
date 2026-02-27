@@ -4,31 +4,27 @@ using System.Collections.Generic;
 using System.Linq;
 using EditorAttributes;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
 public class Weapon : MonoBehaviour
 {
     [SerializeField, ReadOnly]
     WeaponData _weaponData = null!;
 
-    [SerializeField]
-    WeaponAttachment _weaponBody = null!;
-
-    private HashSet<AttachmentPoint> _currentAttachmentPoints = new();
-    private HashSet<WeaponAttachment> _currentAttachments = new();
+    private WeaponAttachment? _weaponBody = null;
 
     private bool _isExploded = false;
     private bool _isMouseOverUI = false;
 
+    private HashSet<AttachmentPoint> _currentAttachmentPoints = new();
+    private HashSet<WeaponAttachment> _currentAttachments = new();
+
+    public bool IsExploded => _isExploded;
+    public WeaponData Stats => _weaponData;
+    public HashSet<AttachmentPoint> CurrentAttachmentPoints => _currentAttachmentPoints;
+    public HashSet<WeaponAttachment> CurrentAttachments => _currentAttachments;
+
     private void Start()
     {
-        HandleAttachmentChanged();
-        Events.OnAttachmentChanged.AddListener(HandleAttachmentChanged);
-
-        Events.OnExplodeWeapon.AddListener((_) => _isExploded = true);
-        Events.OnCompactWeapon.AddListener((_) => _isExploded = false);
-
         float inputStartTime = 0;
 
         Controls.InputActions.Camera.Pan.performed += _ =>
@@ -49,9 +45,18 @@ public class Weapon : MonoBehaviour
 
         Controls.InputActions.Camera.ResetCamera.performed += _ =>
         {
-            _weaponBody.RemoveAttachments();
+            if (_weaponBody == null)
+                return;
+
+            _weaponBody.RemoveSubAttachments();
             _weaponBody.SetRandomAttachments();
         };
+
+        Events.OnExplodeWeapon.AddListener((_) => _isExploded = true);
+        Events.OnCompactWeapon.AddListener((_) => _isExploded = false);
+
+        Events.OnAttachmentChanged.AddListener(HandleAttachmentChanged);
+        HandleAttachmentChanged();
     }
 
     private void OnDestroy()
@@ -62,32 +67,26 @@ public class Weapon : MonoBehaviour
         Events.OnCompactWeapon.RemoveAllListeners();
     }
 
-    private void Update()
-    {
-        // A little hacky, but stops the warning in console about calling the function
-        //  from within event callback.
-        // TODO: Figure out a better way to check this in "new" InputSystem.
-        _isMouseOverUI = EventSystem.current.IsPointerOverGameObject();
-    }
-
-    public WeaponData Stats => _weaponData;
-    public HashSet<AttachmentPoint> CurrentAttachmentPoints => _currentAttachmentPoints;
-    public HashSet<WeaponAttachment> CurrentAttachments => _currentAttachments;
-
-    public bool IsExploded => _isExploded;
-
     public void LoadPreset(WeaponPreset preset)
     {
         ChangeBody(preset.Body);
 
+        if (_weaponBody == null)
+        {
+            Debug.LogError("Could not load preset after changing weapon body, the body is null!");
+            return;
+        }
+
         _weaponBody.LoadAttachments(preset.AttachmentIDList);
     }
 
+#if UNITY_EDITOR
     [ContextMenu("Print Current Attachment IDs")]
     public void PrintCurrentAttachmentIDs()
     {
         Debug.Log(string.Join(", ", _currentAttachments.Select(a => a.ID)));
     }
+#endif
 
     public void ChangeBody(WeaponAttachment body)
     {
@@ -109,20 +108,16 @@ public class Weapon : MonoBehaviour
             return;
 
         if (_isExploded)
-        {
             Events.OnCompactWeapon.Invoke(true);
-        }
 
         _currentAttachmentPoints = _weaponBody.FetchAttachmentSlots();
         _currentAttachments = _weaponBody.FetchEquippedAttachments();
 
         ClearStats();
-        AddStatsModifiers(_weaponBody.StatsModifiers);
+        AddStatsModifiers(_weaponBody.Modifiers);
 
         foreach (var attachment in _currentAttachments)
-        {
-            AddStatsModifiers(attachment.StatsModifiers);
-        }
+            AddStatsModifiers(attachment.Modifiers);
 
         Events.OnUpdateUI.Invoke();
     }

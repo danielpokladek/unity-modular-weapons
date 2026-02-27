@@ -96,8 +96,7 @@ public class AttachmentPickerController : MonoBehaviour
         var noneButton = GetButton("NONE", null);
         noneButton.SetEnabled(currentAttachment != null);
 
-        var noneCallback =
-            (EventCallback<ClickEvent>)((_) => _currentPoint.RemoveCurrentAttachment());
+        var noneCallback = (EventCallback<ClickEvent>)((_) => _currentPoint.RemoveAttachment());
         _cleanupActions.Add(() => noneButton.UnregisterCallback(noneCallback));
         noneButton.RegisterCallback(noneCallback);
 
@@ -105,7 +104,7 @@ public class AttachmentPickerController : MonoBehaviour
 
         foreach (var attachment in availableAttachments)
         {
-            var attachmentButton = GetButton(attachment.Name, attachment.UISprite);
+            var attachmentButton = GetButton(attachment.Name, attachment.Sprite);
             attachmentButton.SetEnabled(currentAttachment != attachment);
 
             var attachmentCallback =

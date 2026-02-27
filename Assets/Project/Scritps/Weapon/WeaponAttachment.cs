@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Linq;
 using PrimeTween;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -13,15 +12,12 @@ public class WeaponAttachment : MonoBehaviour
     string _name = "";
 
     [SerializeField]
-    bool _canBeRemoved = true;
-
-    [SerializeField]
     List<AttachmentPoint> _attachmentPoints = new();
 
     [SerializeField]
     WeaponData _statsModifiers = null!;
 
-    [Header("Auto Assigned")]
+    [Header("Auto Assigned (using IconForge)")]
     [SerializeField]
     Sprite _uiSprite = null!;
 
@@ -32,16 +28,49 @@ public class WeaponAttachment : MonoBehaviour
     private Vector3 _originalPosition;
 
     public string Name => _name;
-
-    public List<AttachmentPoint> AttachmentPoints => _attachmentPoints;
-
-    public WeaponData StatsModifiers => _statsModifiers;
-
-    public Sprite UISprite => _uiSprite;
-
-    public bool CanBeRemoved => _canBeRemoved;
-
+    public List<AttachmentPoint> Points => _attachmentPoints;
+    public WeaponData Modifiers => _statsModifiers;
+    public Sprite Sprite => _uiSprite;
     public int ID => _id;
+
+    private static Vector3 GetAxisDirection(Vector3 position)
+    {
+        var dir = position - new Vector3(0, 0.06f, 0.05f);
+
+        if (dir == Vector3.zero)
+            return Vector3.zero;
+
+        dir.Normalize();
+
+        float horiz = Mathf.Sqrt(dir.x * dir.x + dir.z * dir.z);
+        float azDeg = Mathf.Atan2(dir.z, dir.x) * Mathf.Rad2Deg;
+        float elDeg = Mathf.Atan2(dir.y, horiz) * Mathf.Rad2Deg;
+
+        float roundedAz = Mathf.Round(azDeg / 45f) * 45f;
+        float roundedEl = Mathf.Round(elDeg / 45f) * 45f;
+
+        float azRad = roundedAz * Mathf.Deg2Rad;
+        float elRad = roundedEl * Mathf.Deg2Rad;
+        float cosEl = Mathf.Cos(elRad);
+
+        var result = new Vector3(
+            cosEl * Mathf.Cos(azRad),
+            Mathf.Sin(elRad),
+            cosEl * Mathf.Sin(azRad)
+        );
+
+        return result.normalized;
+    }
+
+    private static void GenerateRandomWeaponStats(WeaponData data)
+    {
+        data.Weight = Random.Range(0.2f, 0.4f);
+        data.Accuracy = Random.Range(0, 350);
+        data.SightingRange = Random.Range(0, 80);
+        data.VerticalRecoil = Random.Range(0, 150);
+        data.HorizontalRecoil = Random.Range(0, 350);
+        data.FireRate = Random.Range(0, 5);
+    }
 
     private void Start()
     {
@@ -52,19 +81,14 @@ public class WeaponAttachment : MonoBehaviour
         }
 
         // TODO: In actual project this would be removed and used by stats from inspector.
-        GenerateRandomWeaponStats();
+        GenerateRandomWeaponStats(_statsModifiers);
 
         _explodeDirection = GetAxisDirection(transform.position);
         _originalPosition = transform.localPosition;
 
-        if (CanBeRemoved)
-        {
-            Events.OnExplodeWeapon.AddListener(ExplodeAttachment);
-            Events.OnCompactWeapon.AddListener(CompactAttachment);
-        }
+        Events.OnExplodeWeapon.AddListener(ExplodeAttachment);
+        Events.OnCompactWeapon.AddListener(CompactAttachment);
     }
-
-    public void HandleCleanup() { }
 
     private void OnDestroy()
     {
@@ -89,9 +113,7 @@ public class WeaponAttachment : MonoBehaviour
             }
 
             if (point.CurrentAttachment != null)
-            {
                 point.CurrentAttachment.LoadAttachments(preset);
-            }
         }
     }
 
@@ -133,7 +155,7 @@ public class WeaponAttachment : MonoBehaviour
 
     public void RemoveAttachment()
     {
-        RemoveAttachments();
+        RemoveSubAttachments();
 
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
@@ -141,12 +163,10 @@ public class WeaponAttachment : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void RemoveAttachments()
+    public void RemoveSubAttachments()
     {
         foreach (var point in _attachmentPoints)
-        {
-            point.RemoveCurrentAttachment();
-        }
+            point.RemoveAttachment();
     }
 
     public void SetRandomAttachments()
@@ -173,42 +193,12 @@ public class WeaponAttachment : MonoBehaviour
     {
         foreach (var point in _attachmentPoints)
         {
-            // TODO: Remove after updating from old script to new.
             if (point == null)
                 continue;
 
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(point.transform.position, 0.01f);
         }
-    }
-
-    private Vector3 GetAxisDirection(Vector3 position)
-    {
-        var dir = position - new Vector3(0, 0.06f, 0.05f);
-
-        if (dir == Vector3.zero)
-            return Vector3.zero;
-
-        dir.Normalize();
-
-        float horiz = Mathf.Sqrt(dir.x * dir.x + dir.z * dir.z);
-        float azDeg = Mathf.Atan2(dir.z, dir.x) * Mathf.Rad2Deg;
-        float elDeg = Mathf.Atan2(dir.y, horiz) * Mathf.Rad2Deg;
-
-        float roundedAz = Mathf.Round(azDeg / 45f) * 45f;
-        float roundedEl = Mathf.Round(elDeg / 45f) * 45f;
-
-        float azRad = roundedAz * Mathf.Deg2Rad;
-        float elRad = roundedEl * Mathf.Deg2Rad;
-        float cosEl = Mathf.Cos(elRad);
-
-        var result = new Vector3(
-            cosEl * Mathf.Cos(azRad),
-            Mathf.Sin(elRad),
-            cosEl * Mathf.Sin(azRad)
-        );
-
-        return result.normalized;
     }
 
     private void ExplodeAttachment(bool isInstant)
@@ -219,15 +209,5 @@ public class WeaponAttachment : MonoBehaviour
     private void CompactAttachment(bool isInstant)
     {
         Tween.LocalPosition(transform, _originalPosition, isInstant ? 0 : 0.25f);
-    }
-
-    private void GenerateRandomWeaponStats()
-    {
-        _statsModifiers.Weight = Random.Range(0.2f, 0.4f);
-        _statsModifiers.Accuracy = Random.Range(0, 350);
-        _statsModifiers.SightingRange = Random.Range(0, 80);
-        _statsModifiers.VerticalRecoil = Random.Range(0, 150);
-        _statsModifiers.HorizontalRecoil = Random.Range(0, 350);
-        _statsModifiers.FireRate = Random.Range(0, 5);
     }
 }

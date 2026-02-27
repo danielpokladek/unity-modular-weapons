@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttachmentPoint : MonoBehaviour
@@ -19,13 +18,21 @@ public class AttachmentPoint : MonoBehaviour
     [SerializeField]
     List<WeaponAttachment> _incompatibleAttachments = new();
 
+    private Manager? _manager;
+
     private AttachmentPointController? _pointController;
+    private HashSet<AttachmentPoint>? _incompatiblePointList;
+    private HashSet<WeaponAttachment>? _incompatibleAttachmentList;
+
+    public string Name => _name;
+    public List<WeaponAttachment> AvailableAttachments => _availableAttachments;
+    public WeaponAttachment? CurrentAttachment { get; private set; } = null;
 
     private void Start()
     {
-        var manager = Manager.Instance;
+        _manager = Manager.Instance;
 
-        if (manager == null)
+        if (_manager == null)
         {
             Debug.LogError(
                 "Unable to initialize attachment point, manager instance not found!",
@@ -34,10 +41,10 @@ public class AttachmentPoint : MonoBehaviour
             return;
         }
 
-        _pointController = manager.UIController.AttachmentPointController;
+        _pointController = _manager.UIController.AttachmentPointController;
 
-        IncompatibleAttachmentPoints = _incompatibleAttachmentPoints.ToHashSet();
-        IncompatibleAttachments = _incompatibleAttachments.ToHashSet();
+        _incompatiblePointList = _incompatibleAttachmentPoints.ToHashSet();
+        _incompatibleAttachmentList = _incompatibleAttachments.ToHashSet();
 
         Events.OnUpdateUI.AddListener(Refresh);
         Refresh();
@@ -45,45 +52,17 @@ public class AttachmentPoint : MonoBehaviour
 
     private void OnDestroy()
     {
-        RemoveCurrentAttachment();
         Events.OnUpdateUI.RemoveListener(Refresh);
+
+        RemoveAttachment();
         _pointController?.DetachAttachmentFromUI(this);
-        // Manager.Instance.UIController.DetachAttachmentFromUI(this);
-    }
-
-    public WeaponAttachment? CurrentAttachment { get; private set; } = null;
-
-    public HashSet<AttachmentPoint> IncompatibleAttachmentPoints { get; private set; } = new();
-    public HashSet<WeaponAttachment> IncompatibleAttachments { get; private set; } = new();
-
-    public string Name => _name;
-    public List<WeaponAttachment> AvailableAttachments => _availableAttachments;
-
-    public void RemoveCurrentAttachment(bool notify = true)
-    {
-        if (CurrentAttachment == null)
-            return;
-
-        // TODO: Pool instead of destroying.
-        CurrentAttachment.RemoveAttachment();
-        Destroy(CurrentAttachment.gameObject);
-        CurrentAttachment = null;
-
-        if (notify)
-        {
-            Events.OnAttachmentChanged.Invoke();
-        }
-    }
-
-    public void Remove()
-    {
-        RemoveCurrentAttachment(false);
-        _pointController?.DetachAttachmentFromUI(this);
-        // Manager.Instance.UIController.DetachAttachmentFromUI(this);
     }
 
     public bool SetAttachment(int id)
     {
+        if (_incompatibleAttachmentList == null || _incompatiblePointList == null)
+            return false;
+
         var attachment = _availableAttachments.Find((a) => a.ID == id);
 
         if (attachment == null)
@@ -95,17 +74,17 @@ public class AttachmentPoint : MonoBehaviour
         var currentWeapon = Manager.Instance.CurrentWeapon;
 
         var attachmentIncompatible = currentWeapon.CurrentAttachments.Any(a =>
-            _incompatibleAttachments.Contains(a)
+            _incompatibleAttachmentList.Contains(a)
         );
 
         var attachmentPointIncompatible = currentWeapon.CurrentAttachmentPoints.Any(p =>
-            _incompatibleAttachmentPoints.Any(p2 => p == p2 && p2.CurrentAttachment != null)
+            _incompatiblePointList.Any(p2 => p == p2 && p2.CurrentAttachment != null)
         );
 
         if (attachmentIncompatible || attachmentPointIncompatible)
             return false;
 
-        RemoveCurrentAttachment(false);
+        RemoveAttachment(false);
 
         CurrentAttachment = Instantiate(attachment, transform);
         CurrentAttachment.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -116,33 +95,47 @@ public class AttachmentPoint : MonoBehaviour
         return true;
     }
 
-    private void Refresh()
+    public void RemoveAttachment(bool notify = true)
     {
-        Weapon? currentWeapon = Manager.Instance.CurrentWeapon;
-
-        if (currentWeapon == null)
+        if (CurrentAttachment == null)
             return;
 
-        var currentAttachmentPoints = currentWeapon.CurrentAttachmentPoints;
-        var currentAttachments = currentWeapon.CurrentAttachments;
+        CurrentAttachment.RemoveAttachment();
+        Destroy(CurrentAttachment.gameObject);
+        CurrentAttachment = null;
 
-        var isIncompatibleWithPoint = currentAttachmentPoints.Where(p =>
-            IncompatibleAttachmentPoints.Contains(p) && p.CurrentAttachment != null
+        if (notify)
+        {
+            Events.OnAttachmentChanged.Invoke();
+        }
+    }
+
+    private void Refresh()
+    {
+        if (_pointController == null || _manager == null || _incompatiblePointList == null)
+            return;
+
+        var weapon = _manager.CurrentWeapon;
+
+        var isIncompatibleWithPoint = weapon.CurrentAttachmentPoints.Any(p =>
+            p.CurrentAttachment != null && _incompatiblePointList.Contains(p)
         );
 
-        var isIncompatibleWithAttachment = currentAttachments.Where(a =>
-            IncompatibleAttachments.Any(b => a.ID == b.ID)
+        var isIncompatibleWithAttachment = weapon.CurrentAttachments.Any(a =>
+            _incompatibleAttachmentList.Any(b => b.ID == a.ID)
         );
 
-        if (isIncompatibleWithPoint.Count() > 0 || isIncompatibleWithAttachment.Count() > 0)
+        var isLinked = _pointController.IsPointLinked(this);
+
+        if (isIncompatibleWithPoint || isIncompatibleWithAttachment)
         {
-            _pointController?.DetachAttachmentFromUI(this);
-            // Manager.Instance.UIController.DetachAttachmentFromUI(this);
+            if (isLinked)
+                _pointController.DetachAttachmentFromUI(this);
+
+            return;
         }
-        else
-        {
-            _pointController?.LinkAttachmentToUI(this);
-            // Manager.Instance.UIController.LinkAttachmentToUI(this);
-        }
+
+        if (!isLinked)
+            _pointController.LinkAttachmentToUI(this);
     }
 }

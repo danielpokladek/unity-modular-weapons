@@ -320,7 +320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dc97253ada85c57d839e33353792079, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
-  _manager: {fileID: 0}
+  _manager: {fileID: 70663526}
   _pivot: {fileID: 1885077183}
   _weaponContainer: {fileID: 1351298149}
   _pivotOffset: {x: 0, y: 0, z: 0.03}
@@ -462,6 +462,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 616062337}
+  - component: {fileID: 616062338}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -488,6 +489,22 @@ Transform:
   - {fileID: 1614656285}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &616062338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 616062336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75f364407f25b0891938ded97f5726c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIController
+  _menuPanel: {fileID: 1614656286}
+  _attachmentPicker: {fileID: 634994593}
+  _attachmentPointController: {fileID: 1549034652}
+  _pointsCanvasGroup: {fileID: 0}
 --- !u!1 &634994592
 GameObject:
   m_ObjectHideFlags: 0
