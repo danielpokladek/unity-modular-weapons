@@ -163,8 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1043781e78c27d8ab4e0622ebd5b4a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager
-  _uiCanvas: {fileID: 0}
-  _uiController: {fileID: 0}
+  _uiController: {fileID: 616062338}
   _cameraController: {fileID: 330585548}
   _currentWeapon: {fileID: 1351298150}
   _weaponPresets:
@@ -504,7 +503,6 @@ MonoBehaviour:
   _menuPanel: {fileID: 1614656286}
   _attachmentPicker: {fileID: 634994593}
   _attachmentPointController: {fileID: 1549034652}
-  _pointsCanvasGroup: {fileID: 0}
 --- !u!1 &634994592
 GameObject:
   m_ObjectHideFlags: 0
@@ -755,7 +753,6 @@ MonoBehaviour:
     HorizontalRecoil: 0
     FireRate: 0
     EffectiveDistance: 0
-  _weaponBody: {fileID: 0}
 --- !u!1 &1413646127
 GameObject:
   m_ObjectHideFlags: 0
