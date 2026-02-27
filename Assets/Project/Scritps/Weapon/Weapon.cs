@@ -48,7 +48,7 @@ public class Weapon : MonoBehaviour
             if (_weaponBody == null)
                 return;
 
-            _weaponBody.RemoveSubAttachments();
+            _weaponBody.RemovePoints();
             _weaponBody.SetRandomAttachments();
         };
 
@@ -90,7 +90,7 @@ public class Weapon : MonoBehaviour
 
     public void ChangeBody(WeaponAttachment body)
     {
-        _weaponBody?.RemoveAttachment();
+        _weaponBody?.Remove();
 
         var newBody = Instantiate(body, transform);
         newBody.transform.localPosition = Vector3.zero;
@@ -118,6 +118,9 @@ public class Weapon : MonoBehaviour
 
         foreach (var attachment in _currentAttachments)
             AddStatsModifiers(attachment.Modifiers);
+
+        foreach (var point in _currentAttachmentPoints)
+            point.Refresh();
 
         Events.OnUpdateUI.Invoke();
     }

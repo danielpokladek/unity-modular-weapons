@@ -105,9 +105,7 @@ public class WeaponAttachment : MonoBehaviour
             foreach (var attachment in point.AvailableAttachments)
             {
                 if (preset.Contains(attachment.ID))
-                {
                     point.SetAttachment(attachment.ID);
-                }
 
                 i++;
             }
@@ -153,9 +151,15 @@ public class WeaponAttachment : MonoBehaviour
         return attachmentPoints;
     }
 
-    public void RemoveAttachment()
+    public void RefreshPoints()
     {
-        RemoveSubAttachments();
+        foreach (var point in _attachmentPoints)
+            point.Refresh();
+    }
+
+    public void Remove()
+    {
+        RemovePoints();
 
         Events.OnExplodeWeapon.RemoveListener(ExplodeAttachment);
         Events.OnCompactWeapon.RemoveListener(CompactAttachment);
@@ -163,10 +167,10 @@ public class WeaponAttachment : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void RemoveSubAttachments()
+    public void RemovePoints()
     {
         foreach (var point in _attachmentPoints)
-            point.RemoveAttachment();
+            point.RemovePoint();
     }
 
     public void SetRandomAttachments()

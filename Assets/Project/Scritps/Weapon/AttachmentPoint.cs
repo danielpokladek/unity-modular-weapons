@@ -41,21 +41,11 @@ public class AttachmentPoint : MonoBehaviour
             return;
         }
 
-        _pointController = _manager.UIController.AttachmentPointController;
-
         _incompatiblePointList = _incompatibleAttachmentPoints.ToHashSet();
         _incompatibleAttachmentList = _incompatibleAttachments.ToHashSet();
 
-        Events.OnUpdateUI.AddListener(Refresh);
-        Refresh();
-    }
-
-    private void OnDestroy()
-    {
-        Events.OnUpdateUI.RemoveListener(Refresh);
-
-        RemoveAttachment();
-        _pointController?.DetachAttachmentFromUI(this);
+        _pointController = _manager.UIController.AttachmentPointController;
+        _pointController.LinkAttachmentToUI(this);
     }
 
     public bool SetAttachment(int id)
@@ -84,7 +74,7 @@ public class AttachmentPoint : MonoBehaviour
         if (attachmentIncompatible || attachmentPointIncompatible)
             return false;
 
-        RemoveAttachment(false);
+        RemoveCurrentAttachment(false);
 
         CurrentAttachment = Instantiate(attachment, transform);
         CurrentAttachment.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -95,12 +85,12 @@ public class AttachmentPoint : MonoBehaviour
         return true;
     }
 
-    public void RemoveAttachment(bool notify = true)
+    public void RemoveCurrentAttachment(bool notify = true)
     {
         if (CurrentAttachment == null)
             return;
 
-        CurrentAttachment.RemoveAttachment();
+        CurrentAttachment.Remove();
         Destroy(CurrentAttachment.gameObject);
         CurrentAttachment = null;
 
@@ -110,7 +100,15 @@ public class AttachmentPoint : MonoBehaviour
         }
     }
 
-    private void Refresh()
+    public void RemovePoint()
+    {
+        _pointController!.DetachAttachmentFromUI(this);
+
+        RemoveCurrentAttachment(false);
+        Destroy(gameObject);
+    }
+
+    public void Refresh()
     {
         if (_pointController == null || _manager == null || _incompatiblePointList == null)
             return;
@@ -131,11 +129,11 @@ public class AttachmentPoint : MonoBehaviour
         {
             if (isLinked)
                 _pointController.DetachAttachmentFromUI(this);
-
-            return;
         }
-
-        if (!isLinked)
-            _pointController.LinkAttachmentToUI(this);
+        else
+        {
+            if (!isLinked)
+                _pointController.LinkAttachmentToUI(this);
+        }
     }
 }

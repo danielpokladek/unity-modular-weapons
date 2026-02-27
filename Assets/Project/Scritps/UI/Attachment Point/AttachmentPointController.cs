@@ -22,7 +22,7 @@ public class AttachmentPointController : MonoBehaviour
 
         foreach (var (point, uiPoint) in _shownPoints)
         {
-            if (uiPoint == null)
+            if (point == null || uiPoint == null)
                 return;
 
             var pointUIPos = RuntimePanelUtils.CameraTransformWorldToPanel(
@@ -69,27 +69,15 @@ public class AttachmentPointController : MonoBehaviour
 
     public void DetachAttachmentFromUI(AttachmentPoint point)
     {
-        if (point == null || _uiRoot == null)
-            return;
-
         if (!_shownPoints.ContainsKey(point))
             return;
 
-        _shownPoints.Remove(point);
-
-        _shownPoints.TryGetValue(point, out VisualElement uiPoint);
-
-        if (uiPoint == null)
-        {
-            Debug.LogWarning(
-                $"Failed to remove UI point for {point.Name} - UI element could still be in tree."
-            );
-
-            return;
-        }
+        var uiPoint = _shownPoints[point];
 
         uiPoint.ClearBindings();
-        _uiRoot.Remove(uiPoint);
+        _uiRoot!.Remove(uiPoint);
+
+        _shownPoints.Remove(point);
     }
 
     private VisualElement GetNewUIPoint()

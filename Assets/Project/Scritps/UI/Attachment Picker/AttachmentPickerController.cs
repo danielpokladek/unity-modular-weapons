@@ -96,7 +96,8 @@ public class AttachmentPickerController : MonoBehaviour
         var noneButton = GetButton("NONE", null);
         noneButton.SetEnabled(currentAttachment != null);
 
-        var noneCallback = (EventCallback<ClickEvent>)((_) => _currentPoint.RemoveAttachment());
+        var noneCallback =
+            (EventCallback<ClickEvent>)((_) => _currentPoint.RemoveCurrentAttachment());
         _cleanupActions.Add(() => noneButton.UnregisterCallback(noneCallback));
         noneButton.RegisterCallback(noneCallback);
 

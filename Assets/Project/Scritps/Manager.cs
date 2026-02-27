@@ -60,9 +60,6 @@ public class AppSettings
 public class Manager : MonoBehaviour
 {
     [SerializeField]
-    Canvas _uiCanvas = null!;
-
-    [SerializeField]
     UIController _uiController = null!;
 
     [SerializeField]
@@ -98,7 +95,6 @@ public class Manager : MonoBehaviour
     public AppSettings Settings { get; private set; }
 #pragma warning restore CS8618
 
-    public Canvas Canvas => _uiCanvas;
     public UIController UIController => _uiController;
     public CameraController CameraController => _cameraController;
 

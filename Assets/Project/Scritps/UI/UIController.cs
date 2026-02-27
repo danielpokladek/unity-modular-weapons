@@ -15,10 +15,6 @@ public class UIController : MonoBehaviour
     [SerializeField]
     AttachmentPointController _attachmentPointController = null!;
 
-    [SerializeField]
-    CanvasGroup _pointsCanvasGroup = null!;
-
-    private Tween? _uiTween;
     public AttachmentPointController AttachmentPointController => _attachmentPointController;
 
     public void Initialize()
@@ -31,8 +27,6 @@ public class UIController : MonoBehaviour
             _menuPanel.Hide();
             _attachmentPicker.Hide();
         });
-
-        Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         _menuPanel.Initialize();
         _attachmentPicker.Initialize();
@@ -64,23 +58,5 @@ public class UIController : MonoBehaviour
     private void HandleAttachmentUnselected()
     {
         _attachmentPicker.Hide();
-    }
-
-    private void ToggleUI()
-    {
-        _uiTween?.Complete();
-
-        var uiVisible = _pointsCanvasGroup.alpha == 1;
-        var desiredAlpha = uiVisible ? 0 : 1;
-
-        _uiTween = Tween.Custom(
-            _pointsCanvasGroup.alpha,
-            desiredAlpha,
-            0.2f,
-            (val) =>
-            {
-                _pointsCanvasGroup.alpha = val;
-            }
-        );
     }
 }
