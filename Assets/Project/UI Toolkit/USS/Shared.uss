@@ -1,0 +1,8 @@
+:root {
+}
+
+.h2 {
+    color: rgb(255, 255, 255);
+    font-size: 22px;
+    -unity-font-definition: url("project://database/Assets/Project/Fonts/Roboto/Roboto-SemiBold.ttf?fileID=12800000&guid=0a7591f21c30233688b31ccf6ae58bf4&type=3#Roboto-SemiBold");
+}

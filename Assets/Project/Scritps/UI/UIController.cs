@@ -10,9 +10,6 @@ public class UIController : MonoBehaviour
     MenuController _menuPanel = null!;
 
     [SerializeField]
-    StatsPanelController _statsPanel = null!;
-
-    [SerializeField]
     AttachmentPickerController _attachmentPicker = null!;
 
     [SerializeField]
@@ -22,8 +19,6 @@ public class UIController : MonoBehaviour
     CanvasGroup _pointsCanvasGroup = null!;
 
     private Tween? _uiTween;
-
-    public StatsPanelController StatsPanel => _statsPanel;
     public AttachmentPointController AttachmentPointController => _attachmentPointController;
 
     public void Initialize()
@@ -37,21 +32,11 @@ public class UIController : MonoBehaviour
             _attachmentPicker.Hide();
         });
 
-        Events.OnUpdateUI.AddListener(() =>
-        {
-            if (Manager.Instance.CurrentWeapon == null)
-                return;
-
-            _statsPanel.UpdateStats(Manager.Instance.CurrentWeapon.Stats);
-        });
-
         Controls.InputActions.UI.ToggleUI.performed += _ => ToggleUI();
 
         _menuPanel.Initialize();
         _attachmentPicker.Initialize();
         _attachmentPointController.Initialize();
-
-        _statsPanel.ToggleStatsPanel();
         _attachmentPicker.Hide(true);
     }
 
