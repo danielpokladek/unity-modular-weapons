@@ -7,6 +7,9 @@ using UnityEngine.EventSystems;
 public class CameraController : MonoBehaviour
 {
     [SerializeField]
+    Manager _manager = null!;
+
+    [SerializeField]
     Transform _pivot = null!;
 
     [SerializeField]
@@ -24,16 +27,15 @@ public class CameraController : MonoBehaviour
 
     private InputSystem_Actions.CameraActions _actions;
 
-    private Manager _manager;
-    private AppSettings _settings;
+    private AppSettings? _settings;
 
-    private Vector2 _mouseDelta;
-    private Vector2 _scrollInput;
+    private Vector2 _mouseDelta = Vector2.zero;
+    private Vector2 _scrollInput = Vector2.zero;
 
-    private float _distance;
+    private float _distance = 0f;
 
-    private bool _isRotating;
-    private bool _isPanning;
+    private bool _isRotating = false;
+    private bool _isPanning = false;
 
     private void Start()
     {
@@ -58,8 +60,6 @@ public class CameraController : MonoBehaviour
 
         _actions.ZoomDelta.performed += ctx => _scrollInput = ctx.ReadValue<Vector2>();
         _actions.ZoomDelta.canceled += _ => _scrollInput = Vector2.zero;
-
-        // _actions.ResetCamera.performed += _ => MoveTo(_weaponContainer);
 
         Events.OnAttachmentPointFocus.AddListener(
             (attachmentPoint) =>
@@ -87,6 +87,9 @@ public class CameraController : MonoBehaviour
 
     private void HandleInputs()
     {
+        if (_settings == null)
+            return;
+
         bool hasMovedMouse = _mouseDelta.sqrMagnitude > 0.1f;
 
         if (_isPanning && hasMovedMouse)

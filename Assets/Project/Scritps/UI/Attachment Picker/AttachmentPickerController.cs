@@ -10,10 +10,7 @@ public class AttachmentPickerController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField]
-    Manager _manager;
-
-    [SerializeField]
-    UIDocument _uiDocument;
+    UIDocument _uiDocument = null!;
 
     private readonly List<Action> _cleanupActions = new();
 

@@ -19,16 +19,23 @@ public class AttachmentPoint : MonoBehaviour
     [SerializeField]
     List<WeaponAttachment> _incompatibleAttachments = new();
 
-    public WeaponAttachment? CurrentAttachment { get; private set; } = null;
-
-    public HashSet<AttachmentPoint> IncompatibleAttachmentPoints { get; private set; } = new();
-    public HashSet<WeaponAttachment> IncompatibleAttachments { get; private set; } = new();
-
-    public string Name => _name;
-    public List<WeaponAttachment> AvailableAttachments => _availableAttachments;
+    private AttachmentPointController? _pointController;
 
     private void Start()
     {
+        var manager = Manager.Instance;
+
+        if (manager == null)
+        {
+            Debug.LogError(
+                "Unable to initialize attachment point, manager instance not found!",
+                gameObject
+            );
+            return;
+        }
+
+        _pointController = manager.UIController.AttachmentPointController;
+
         IncompatibleAttachmentPoints = _incompatibleAttachmentPoints.ToHashSet();
         IncompatibleAttachments = _incompatibleAttachments.ToHashSet();
 
@@ -40,8 +47,17 @@ public class AttachmentPoint : MonoBehaviour
     {
         RemoveCurrentAttachment();
         Events.OnUpdateUI.RemoveListener(Refresh);
-        Manager.Instance.UIController.DetachAttachmentFromUI(this);
+        _pointController?.DetachAttachmentFromUI(this);
+        // Manager.Instance.UIController.DetachAttachmentFromUI(this);
     }
+
+    public WeaponAttachment? CurrentAttachment { get; private set; } = null;
+
+    public HashSet<AttachmentPoint> IncompatibleAttachmentPoints { get; private set; } = new();
+    public HashSet<WeaponAttachment> IncompatibleAttachments { get; private set; } = new();
+
+    public string Name => _name;
+    public List<WeaponAttachment> AvailableAttachments => _availableAttachments;
 
     public void RemoveCurrentAttachment(bool notify = true)
     {
@@ -62,7 +78,8 @@ public class AttachmentPoint : MonoBehaviour
     public void Remove()
     {
         RemoveCurrentAttachment(false);
-        Manager.Instance.UIController.DetachAttachmentFromUI(this);
+        _pointController?.DetachAttachmentFromUI(this);
+        // Manager.Instance.UIController.DetachAttachmentFromUI(this);
     }
 
     public bool SetAttachment(int id)
@@ -91,9 +108,8 @@ public class AttachmentPoint : MonoBehaviour
         RemoveCurrentAttachment(false);
 
         CurrentAttachment = Instantiate(attachment, transform);
-
-        CurrentAttachment.transform.localPosition = Vector3.zero;
-        CurrentAttachment.transform.localRotation = Quaternion.identity;
+        CurrentAttachment.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        _pointController?.LinkAttachmentToUI(this);
 
         Events.OnAttachmentChanged.Invoke();
 
@@ -120,11 +136,13 @@ public class AttachmentPoint : MonoBehaviour
 
         if (isIncompatibleWithPoint.Count() > 0 || isIncompatibleWithAttachment.Count() > 0)
         {
-            Manager.Instance.UIController.DetachAttachmentFromUI(this);
+            _pointController?.DetachAttachmentFromUI(this);
+            // Manager.Instance.UIController.DetachAttachmentFromUI(this);
         }
         else
         {
-            Manager.Instance.UIController.LinkAttachmentToUI(this);
+            _pointController?.LinkAttachmentToUI(this);
+            // Manager.Instance.UIController.LinkAttachmentToUI(this);
         }
     }
 }

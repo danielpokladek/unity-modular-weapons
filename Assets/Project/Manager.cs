@@ -68,10 +68,6 @@ public class Manager : MonoBehaviour
     [SerializeField]
     CameraController _cameraController = null!;
 
-    [Header("Shared Prefabs")]
-    [SerializeField]
-    AttachmentPointUI _attachmentPointUIPrefab = null!;
-
     [SerializeField]
     Weapon _currentWeapon = null!;
 
@@ -95,15 +91,16 @@ public class Manager : MonoBehaviour
         _uiController.Initialize();
     }
 
+    // * Disable warning here, so Unity doesn't complain in console as both are always assigned in `Awake()`,
+    // *  but when compiled `Awake` and `Start` methods aren't seen as constructors.
+#pragma warning disable CS8618
     public static Manager Instance { get; private set; }
-
     public AppSettings Settings { get; private set; }
+#pragma warning restore CS8618
 
     public Canvas Canvas => _uiCanvas;
     public UIController UIController => _uiController;
     public CameraController CameraController => _cameraController;
-
-    public AttachmentPointUI AttachmentPointUIPrefab => _attachmentPointUIPrefab;
 
     public bool IsAttachmentSelected => _currentAttachmentPoint != null;
     public AttachmentPoint? CurrentAttachmentPoint => _currentAttachmentPoint;

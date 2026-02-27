@@ -8,7 +8,7 @@ public class WeaponPreset : ScriptableObject
     string _name = "";
 
     [SerializeField]
-    WeaponAttachment _body;
+    WeaponAttachment _body = null!;
 
     [SerializeField]
     List<int> _attachmentIDList = new();

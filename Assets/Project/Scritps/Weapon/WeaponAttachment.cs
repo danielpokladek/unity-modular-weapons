@@ -19,7 +19,7 @@ public class WeaponAttachment : MonoBehaviour
     List<AttachmentPoint> _attachmentPoints = new();
 
     [SerializeField]
-    WeaponData _statsModifiers;
+    WeaponData _statsModifiers = null!;
 
     [Header("Auto Assigned")]
     [SerializeField]
